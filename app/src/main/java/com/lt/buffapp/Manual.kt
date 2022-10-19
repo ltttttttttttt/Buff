@@ -28,7 +28,7 @@ fun ColumnScope.Manual() {
 }
 
 @kotlinx.serialization.Serializable
-data class ManualBean(
+class ManualBean(
     val id: Int? = null,
 ) {
     @kotlinx.serialization.Transient

@@ -30,12 +30,12 @@ fun ColumnScope.Common() {
 }
 
 @kotlinx.serialization.Serializable
-data class CommonBean(
+class CommonBean(
     val id: Int? = null,
     val name: String? = null,
 )
 
-data class CommonStateBean(
+class CommonStateBean(
     val id: Int? = null,
     val name: MutableState<String?>,
 )
