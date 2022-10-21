@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     kotlin("plugin.serialization") version kotlinVersion
+    id("com.google.devtools.ksp") version kspVersion
 }
 
 android {
@@ -20,14 +21,35 @@ android {
         //    useSupportLibrary true
         //}
     }
-
     buildTypes {
+        debug{
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            kotlin {
+                sourceSets.main {
+                    kotlin.srcDir("build/generated/ksp/debug/kotlin")
+                }
+            }
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            kotlin {
+                sourceSets.main {
+                    kotlin.srcDir("build/generated/ksp/release/kotlin")
+                }
+            }
+        }
+    }
+    kotlin {
+        sourceSets.test {
+            kotlin.srcDir("build/generated/ksp/test/kotlin")
         }
     }
     compileOptions {
@@ -48,9 +70,17 @@ android {
     //        excludes += '/META-INF/{AL2.0,LGPL2.1}'
     //    }
     //}
+    //ksp配置
+    //ksp {
+    //    arg("option1", "value1")
+    //    arg("option2", "value2")
+    //}
 }
 
 dependencies {
+    implementation(project(":buff"))
+    ksp(project(":buff"))
+
     implementation("androidx.core:core-ktx:1.7.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.3.1")
     implementation("androidx.activity:activity-compose:1.3.1")
