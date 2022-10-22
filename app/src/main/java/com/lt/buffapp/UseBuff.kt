@@ -16,10 +16,13 @@ import com.lt.buff.Buff
 @Composable
 fun ColumnScope.UseBuff() {
     val bean = remember {
-        """{"id":1,"name":"UseBuff"}""".jsonToAny<BuffBean>().addBuff()
+        """{"id":1,"name":"UseBuff","info":{"nick":"init"}}""".jsonToAny<BuffBean>().addBuff()
     }
-    Text(text = "Buff方式,id=${bean.id}")
-    TextField(value = bean.name ?: "", onValueChange = { bean.name = it })
+    Text(text = "Buff方式,id=${bean.id},nick=${bean.info?.nick}")
+    TextField(value = bean.name ?: "", onValueChange = {
+        bean.name = it
+        bean.info?.nick = it
+    })
     Button(onClick = {
         bean.toJson().showToast()
     }) {
@@ -31,6 +34,16 @@ fun ColumnScope.UseBuff() {
 @Buff
 class BuffBean(
     val id: Int? = null,
+    val info: InfoBean? = null,
 ) {
     var name: String? = null
+    var info2: InfoBean? = null
+}
+
+@kotlinx.serialization.Serializable
+@Buff
+class InfoBean(
+    val age: Int? = null,
+) {
+    var nick: String? = null
 }

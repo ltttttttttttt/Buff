@@ -4,6 +4,7 @@ import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSVisitorVoid
+import com.google.devtools.ksp.symbol.Nullability
 
 /**
  * creator: lt  2022/10/20  lt.dygzs@qq.com
@@ -11,6 +12,9 @@ import com.google.devtools.ksp.symbol.KSVisitorVoid
  * warning:
  */
 internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) : KSVisitorVoid() {
+    private val suffix = "WithBuff"
+    private val buffName = Buff::class.simpleName
+
     /**
      * 访问class的声明
      */
@@ -18,7 +22,7 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
         //获取class信息并创建kt文件
         val packageName = classDeclaration.containingFile!!.packageName.asString()
         val originalClassName = classDeclaration.simpleName.asString()
-        val className = "${originalClassName}WithBuff"
+        val className = "$originalClassName$suffix"
         val file = environment.codeGenerator.createNewFile(
             Dependencies(
                 true,
@@ -38,22 +42,40 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
         //类内的字段(非构造内的)
         val classFields = mutableListOf<String>()
         //addBuff和removeBuff函数用到的字段
-        val functionFields = mutableListOf<Pair<String, Boolean/*isInTheConstructor*/>>()
+        val functionFields = mutableListOf<FunctionFieldsInfo>()
         //遍历构造内的字段
         classDeclaration.primaryConstructor?.parameters?.forEach {
             val name = it.name?.getShortName() ?: ""
-            file.appendText("    ${if (it.isVal) "val" else "var"} $name: ${it.type.resolve()},\n")
-            functionFields.add(name to true)
+            val ksType = it.type.resolve()
+            val isBuffBean =
+                ksType.declaration.annotations.toList()
+                    .find { it.shortName.getShortName() == buffName } != null
+            val type = ksType.declaration.simpleName.getShortName()
+            val nullable = if (ksType.nullability == Nullability.NULLABLE) "?" else ""
+            environment.logger.warn(type)
+            //写入构造内的普通字段
+            file.appendText("    ${if (it.isVal) "val" else "var"} $name: ${if (isBuffBean) "$type$suffix$nullable" else "$type$nullable"},\n")
+            functionFields.add(FunctionFieldsInfo(name, true, isBuffBean))
         }
         //遍历所有字段
         classDeclaration.getAllProperties().forEach {
             //只解析类成员
             if (it.parent is KSClassDeclaration) {
                 val fieldName = it.simpleName.getShortName()
+                if (!it.isMutable)
+                    throw RuntimeException("$originalClassName.$fieldName: It is meaningless for the field of val to change to the MutableState<T>")
+                val ksType = it.type.resolve()
+                val isBuffBean =
+                    ksType.declaration.annotations.toList()
+                        .find { it.shortName.getShortName() == buffName } != null
+                val typeName = ksType.declaration.simpleName.getShortName()
+                val nullable = if (ksType.nullability == Nullability.NULLABLE) "?" else ""
                 val stateFieldName = "_${fieldName}_state"
-                file.appendText("    @kotlinx.serialization.Transient val $stateFieldName: MutableState<${it.type.resolve()}> = null!!,\n")
+                val buffType = if (isBuffBean) "$typeName$suffix$nullable" else "$typeName$nullable"
+                //写入构造内的state字段
+                file.appendText("    @kotlinx.serialization.Transient val $stateFieldName: MutableState<$buffType> = null!!,\n")
                 classFields.add(
-                    "    var $fieldName: ${it.type.resolve()} = $stateFieldName.value\n" +
+                    "    var $fieldName: $buffType = $stateFieldName.value\n" +
                             "        get() {\n" +
                             "            $stateFieldName.value = field\n" +
                             "            return $stateFieldName.value\n" +
@@ -63,7 +85,7 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
                             "            $stateFieldName.value = value\n" +
                             "        }\n"
                 )
-                functionFields.add(fieldName to false)
+                functionFields.add(FunctionFieldsInfo(fieldName, false, isBuffBean))
             }
         }
         file.appendText(") {\n")
@@ -73,11 +95,25 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
         file.appendText(
             "\n    fun removeBuff(): $originalClassName =\n" +
                     "        $originalClassName(${
-                        functionFields.filter { it.second }.map { it.first }.joinToString()
+                        functionFields.filter { it.isInTheConstructor }
+                            .map {
+                                if (it.isBuffBean)
+                                    "${it.fieldName}?.removeBuff()"
+                                else
+                                    it.fieldName
+                            }
+                            .joinToString()
                     }).also {\n"
         )
-        functionFields.filter { !it.second }.forEach {
-            file.appendText("            it.${it.first} = ${it.first}\n")
+        functionFields.filter { !it.isInTheConstructor }.forEach {
+            file.appendText(
+                "            it.${it.fieldName} = ${
+                    if (it.isBuffBean)
+                        "${it.fieldName}?.removeBuff()"
+                    else
+                        it.fieldName
+                }\n"
+            )
         }
         file.appendText("        }\n")
         file.appendText("}\n\n")
@@ -87,15 +123,26 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
                     "    $className(\n"
         )
         functionFields.forEach {
-            if (it.second)
-                file.appendText("        ${it.first},\n")
+            if (it.isInTheConstructor)
+                file.appendText(
+                    "        ${
+                        if (it.isBuffBean)
+                            "${it.fieldName}?.addBuff()"
+                        else
+                            it.fieldName
+                    },\n"
+                )
             else
-                file.appendText("        mutableStateOf(${it.first}),\n")
+                file.appendText(
+                    "        mutableStateOf(${
+                        if (it.isBuffBean)
+                            "${it.fieldName}?.addBuff()"
+                        else
+                            it.fieldName
+                    }),\n"
+                )
         }
-        file.appendText(
-            "    )\n\n" /*+
-                    "operator fun $originalClassName.invoke(): $className = addBuff()"*/
-        )
+        file.appendText("    )\n\n")
         file.close()
     }
 }
