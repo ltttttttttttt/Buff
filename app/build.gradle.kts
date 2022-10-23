@@ -22,7 +22,7 @@ android {
         //}
     }
     buildTypes {
-        debug{
+        debug {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -72,8 +72,10 @@ android {
     //}
     //ksp配置
     //ksp {
-    //    arg("option1", "value1")
-    //    arg("option2", "value2")
+    //    arg("customInClassWithBuff", "//Class end")
+    //    arg("customInFileWithBuff", "//File end")
+    //    arg("classSerializeAnnotationWithBuff", "//Not have")
+    //    arg("fieldSerializeTransientAnnotationWithBuff", "@kotlin.jvm.Transient")
     //}
 }
 

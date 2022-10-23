@@ -1,4 +1,4 @@
-package com.lt.buff
+package com.lt.buff.provider
 
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment

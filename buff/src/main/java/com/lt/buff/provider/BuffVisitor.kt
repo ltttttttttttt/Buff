@@ -1,10 +1,15 @@
-package com.lt.buff
+package com.lt.buff.provider
 
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSVisitorVoid
 import com.google.devtools.ksp.symbol.Nullability
+import com.lt.buff.Buff
+import com.lt.buff.appendText
+import com.lt.buff.options.CustomOptionsInfo
+import com.lt.buff.options.FunctionFieldsInfo
+import com.lt.buff.options.KspOptions
 
 /**
  * creator: lt  2022/10/20  lt.dygzs@qq.com
@@ -12,8 +17,8 @@ import com.google.devtools.ksp.symbol.Nullability
  * warning:
  */
 internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) : KSVisitorVoid() {
-    private val suffix = "WithBuff"
     private val buffName = Buff::class.simpleName
+    private val options = KspOptions(environment)
 
     /**
      * 访问class的声明
@@ -22,7 +27,7 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
         //获取class信息并创建kt文件
         val packageName = classDeclaration.containingFile!!.packageName.asString()
         val originalClassName = classDeclaration.simpleName.asString()
-        val className = "$originalClassName$suffix"
+        val className = "$originalClassName${options.suffix}"
         val file = environment.codeGenerator.createNewFile(
             Dependencies(
                 true,
@@ -36,7 +41,7 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
                     "import androidx.compose.runtime.mutableStateOf\n\n"
         )
         file.appendText(
-            "@kotlinx.serialization.Serializable\n" +// TODO by lt 2022/10/21 17:23 后续改为多种json解析方式支持
+            "${options.getClassSerializeAnnotation()}\n" +
                     "class $className(\n"
         )
         //类内的字段(非构造内的)
@@ -53,7 +58,7 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
             val type = ksType.declaration.simpleName.getShortName()
             val nullable = if (ksType.nullability == Nullability.NULLABLE) "?" else ""
             //写入构造内的普通字段
-            file.appendText("    ${if (it.isVal) "val" else "var"} $name: ${if (isBuffBean) "$type$suffix$nullable" else "$type$nullable"},\n")
+            file.appendText("    ${if (it.isVal) "val" else "var"} $name: ${if (isBuffBean) "$type${options.suffix}$nullable" else "$type$nullable"},\n")
             functionFields.add(FunctionFieldsInfo(name, true, isBuffBean))
         }
         //遍历所有字段
@@ -70,9 +75,10 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
                 val typeName = ksType.declaration.simpleName.getShortName()
                 val nullable = if (ksType.nullability == Nullability.NULLABLE) "?" else ""
                 val stateFieldName = "_${fieldName}_state"
-                val buffType = if (isBuffBean) "$typeName$suffix$nullable" else "$typeName$nullable"
+                val buffType =
+                    if (isBuffBean) "$typeName${options.suffix}$nullable" else "$typeName$nullable"
                 //写入构造内的state字段
-                file.appendText("    @kotlinx.serialization.Transient val $stateFieldName: MutableState<$buffType> = null!!,\n")
+                file.appendText("    ${options.getFieldSerializeTransientAnnotation()} val $stateFieldName: MutableState<$buffType> = null!!,\n")
                 classFields.add(
                     "    var $fieldName: $buffType = $stateFieldName.value\n" +
                             "        get() {\n" +
@@ -88,6 +94,11 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
             }
         }
         file.appendText(") {\n")
+
+        fun getInfo() = CustomOptionsInfo(
+            originalClassName, className
+        )
+
         //写入非构造内的字段
         classFields.forEach(file::appendText)
         //写入removeBuff
@@ -115,6 +126,7 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
             )
         }
         file.appendText("        }\n")
+        file.appendText("\n${options.getCustomInClass(::getInfo)}\n\n")
         file.appendText("}\n\n")
         //写入addBuff
         file.appendText(
@@ -141,7 +153,7 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
                     }),\n"
                 )
         }
-        file.appendText("    )\n\n")
+        file.appendText("    )\n\n${options.getCustomInFile(::getInfo)}")
         file.close()
     }
 }
