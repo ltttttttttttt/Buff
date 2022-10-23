@@ -79,7 +79,7 @@ bean.name//The name's getter and setter have the effect of MutableState<T>
 bean.removeBuff()//Fallback to BuffBean(optional)
 ```
 
-Step 4.Add ksp dir to the srcDir 
+Step 4.Add ksp dir to the srcDir
 
 Your app dir, build.gradle.kts add:
 
@@ -140,5 +140,28 @@ kotlin {
     sourceSets.test {
         kotlin.srcDir("build/generated/ksp/test/kotlin")
     }
+}
+```
+
+Step 5.Config
+
+Serialize of this project uses kotlinx-serialization by default, To modify, Your app dir,
+build.gradle.kts add:
+
+```kotlin
+ksp {
+    //Set the Annotation of the class, Usually as follows
+    arg("classSerializeAnnotationWithBuff", "//Not have")
+    //Set the Annotation of the field to transient, Usually as follows
+    arg("fieldSerializeTransientAnnotationWithBuff", "@kotlin.jvm.Transient")
+}
+```
+
+Add custom code, reference [KspOptions.handlerCustomCode], Your app dir, build.gradle.kts add:
+
+```kotlin
+ksp {
+    arg("customInClassWithBuff", "//Class end")//in class
+    arg("customInFileWithBuff", "//File end")//in file
 }
 ```
