@@ -55,10 +55,11 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
             val isBuffBean =
                 ksType.declaration.annotations.toList()
                     .find { it.shortName.getShortName() == buffName } != null
-            val type = ksType.declaration.simpleName.getShortName()
+            val typeName =
+                "${ksType.declaration.packageName.asString()}.${ksType.declaration.simpleName.asString()}"
             val nullable = if (ksType.nullability == Nullability.NULLABLE) "?" else ""
             //写入构造内的普通字段
-            file.appendText("    ${if (it.isVal) "val" else "var"} $name: ${if (isBuffBean) "$type${options.suffix}$nullable" else "$type$nullable"},\n")
+            file.appendText("    ${if (it.isVal) "val" else "var"} $name: ${if (isBuffBean) "$typeName${options.suffix}$nullable" else "$typeName$nullable"},\n")
             functionFields.add(FunctionFieldsInfo(name, true, isBuffBean))
         }
         //遍历所有字段
@@ -72,7 +73,8 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
                 val isBuffBean =
                     ksType.declaration.annotations.toList()
                         .find { it.shortName.getShortName() == buffName } != null
-                val typeName = ksType.declaration.simpleName.getShortName()
+                val typeName =
+                    "${ksType.declaration.packageName.asString()}.${ksType.declaration.simpleName.asString()}"
                 val nullable = if (ksType.nullability == Nullability.NULLABLE) "?" else ""
                 val stateFieldName = "_${fieldName}_state"
                 val buffType =

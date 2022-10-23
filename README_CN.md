@@ -20,7 +20,6 @@
 1. 适用于多平台
 2. 对List的支持(可能)
 3. 对嵌套类和嵌套List的支持(可能)
-4. (可能需要支持外部包)
 
 ## 使用方式
 
@@ -54,8 +53,8 @@ plugins {
 
 dependencies {
     ...
-    implementation("com.github.ltttttttttttt:Buff:$version")//this,比如0.0.2
-    ksp("com.github.ltttttttttttt:Buff:$version")//this,比如0.0.2
+    implementation("com.github.ltttttttttttt:Buff:$version")//this,比如0.0.3
+    ksp("com.github.ltttttttttttt:Buff:$version")//this,比如0.0.3
 }
 ```
 

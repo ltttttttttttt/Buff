@@ -51,8 +51,8 @@ plugins {
 
 dependencies {
     ...
-    implementation("com.github.ltttttttttttt:Buff:$version")//this, such as 0.0.2
-    ksp("com.github.ltttttttttttt:Buff:$version")//this, such as 0.0.2
+    implementation("com.github.ltttttttttttt:Buff:$version")//this, such as 0.0.3
+    ksp("com.github.ltttttttttttt:Buff:$version")//this, such as 0.0.3
 }
 ```
 
