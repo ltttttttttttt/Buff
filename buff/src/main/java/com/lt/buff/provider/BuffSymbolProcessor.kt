@@ -1,10 +1,11 @@
-package com.lt.buff
+package com.lt.buff.provider
 
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.lt.buff.Buff
 
 /**
  * creator: lt  2022/10/20  lt.dygzs@qq.com

@@ -20,9 +20,6 @@
 1. 适用于多平台
 2. 对List的支持(可能)
 3. 对嵌套类和嵌套List的支持(可能)
-4. 对其他json解析框架的支持
-5. 支持自定义增加代码
-6. (可能需要支持外部包)
 
 ## 使用方式
 
@@ -56,8 +53,8 @@ plugins {
 
 dependencies {
     ...
-    implementation("com.github.ltttttttttttt:Buff:$version")//this,比如0.0.2
-    ksp("com.github.ltttttttttttt:Buff:$version")//this,比如0.0.2
+    implementation("com.github.ltttttttttttt:Buff:$version")//this,比如0.0.3
+    ksp("com.github.ltttttttttttt:Buff:$version")//this,比如0.0.3
 }
 ```
 
@@ -144,5 +141,27 @@ kotlin {
     sourceSets.test {
         kotlin.srcDir("build/generated/ksp/test/kotlin")
     }
+}
+```
+
+Step 5.配置
+
+本项目对序列化的默认支持为:kotlinx-serialization,如需修改,在app模块目录内的build.gradle.kts内添加:
+
+```kotlin
+ksp {
+    //设置类序列化所需要的注解,其他序列化库一般不需要,所以我们放一个注释即可
+    arg("classSerializeAnnotationWithBuff", "//Not have")
+    //设置属性无需被序列化的注解,一般使用jvm中的transient关键字
+    arg("fieldSerializeTransientAnnotationWithBuff", "@kotlin.jvm.Transient")
+}
+```
+
+支持自定义增加代码,属性参考[KspOptions.handlerCustomCode],在app模块目录内的build.gradle.kts内添加:
+
+```kotlin
+ksp {
+    arg("customInClassWithBuff", "//Class end")//类内
+    arg("customInFileWithBuff", "//File end")//类外,kt文件内
 }
 ```

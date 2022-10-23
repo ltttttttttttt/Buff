@@ -7,6 +7,7 @@ import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import com.lt.buff.Buff
+import com.lt.buffapp.ui.theme.Type
 
 /**
  * creator: lt  2022/10/19  lt.dygzs@qq.com
@@ -34,10 +35,10 @@ fun ColumnScope.UseBuff() {
 @Buff
 class BuffBean(
     val id: Int? = null,
-    val info: InfoBean? = null,
 ) {
     var name: String? = null
-    var info2: InfoBean? = null
+    var info: InfoBean? = null
+    var type: Type? = null
 }
 
 @kotlinx.serialization.Serializable

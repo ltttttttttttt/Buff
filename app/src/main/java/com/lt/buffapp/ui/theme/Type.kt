@@ -26,3 +26,8 @@ val Typography = Typography(
     )
     */
 )
+
+@kotlinx.serialization.Serializable
+class Type(
+    val type: Int = 0
+)

@@ -14,3 +14,9 @@ import java.io.OutputStream
 internal fun OutputStream.appendText(str: String) {
     this.write(str.toByteArray())
 }
+
+/**
+ * 如果字符串为空或长度为0,就使用lambda中的字符串
+ */
+internal inline fun String?.ifNullOfEmpty(defaultValue: () -> String): String =
+    if (this.isNullOrEmpty()) defaultValue() else this
