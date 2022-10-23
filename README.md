@@ -49,25 +49,6 @@ plugins {
     id("com.google.devtools.ksp") version "1.7.10-1.0.6"//this, The left 1.7.10 corresponds to your the Kotlin version,more version: https://github.com/google/ksp/releases
 }
 
-buildTypes {
-    release {
-        ...
-        kotlin {
-            sourceSets.main {
-                kotlin.srcDir("build/generated/ksp/release/kotlin")//this
-            }
-        }
-    }
-    debug {
-        ...
-        kotlin {
-            sourceSets.main {
-                kotlin.srcDir("build/generated/ksp/debug/kotlin")//this
-            }
-        }
-    }
-}
-
 dependencies {
     ...
     implementation("com.github.ltttttttttttt:Buff:$version")//this, such as 0.0.2
@@ -96,4 +77,68 @@ val buffBean = BuffBean(0)
 val bean = buffBean.addBuff()//Transform to the BuffBeanWithBuff
 bean.name//The name's getter and setter have the effect of MutableState<T>
 bean.removeBuff()//Fallback to BuffBean(optional)
+```
+
+Step 4.Add ksp dir to the srcDir 
+
+Your app dir, build.gradle.kts add:
+
+```kotlin
+//If your project is the android, and the productFlavors is not set
+android {
+    buildTypes {
+        release {
+            kotlin {
+                sourceSets.main {
+                    kotlin.srcDir("build/generated/ksp/release/kotlin")
+                }
+            }
+        }
+        debug {
+            kotlin {
+                sourceSets.main {
+                    kotlin.srcDir("build/generated/ksp/debug/kotlin")
+                }
+            }
+        }
+    }
+    kotlin {
+        sourceSets.test {
+            kotlin.srcDir("build/generated/ksp/test/kotlin")
+        }
+    }
+}
+
+//If your project is the android, and the productFlavors is set
+applicationVariants.all {
+    outputs.all {
+        val flavorAndBuildTypeName = name
+        kotlin {
+            sourceSets.main {
+                kotlin.srcDir(
+                    "build/generated/ksp/${
+                        flavorAndBuildTypeName.split("-").let {
+                            it.first() + it.last()[0].toUpperCase() + it.last().substring(1)
+                        }
+                    }/kotlin"
+                )
+            }
+        }
+    }
+}
+kotlin {
+    sourceSets.test {
+        kotlin.srcDir("build/generated/ksp/test/kotlin")
+    }
+}
+
+//If your project is the jvm or more
+kotlin {
+    sourceSets.main {
+        kotlin.srcDir("build/generated/ksp/main/kotlin")
+    }
+    sourceSets.test {
+        kotlin.srcDir("build/generated/ksp/test/kotlin")
+    }
+}
 ```

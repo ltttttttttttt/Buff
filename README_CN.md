@@ -54,25 +54,6 @@ plugins {
     id("com.google.devtools.ksp") version "1.7.10-1.0.6"//this,前面的1.7.10对应你的kotlin版本,更多版本参考: https://github.com/google/ksp/releases
 }
 
-buildTypes {
-    release {
-        ...
-        kotlin {
-            sourceSets.main {
-                kotlin.srcDir("build/generated/ksp/release/kotlin")//this todo 后续修改为自动获取
-            }
-        }
-    }
-    debug {
-        ...
-        kotlin {
-            sourceSets.main {
-                kotlin.srcDir("build/generated/ksp/debug/kotlin")//this
-            }
-        }
-    }
-}
-
 dependencies {
     ...
     implementation("com.github.ltttttttttttt:Buff:$version")//this,比如0.0.2
@@ -100,4 +81,68 @@ val buffBean = BuffBean(0)//这个BuffBean可以自己new出来,也可以通过�
 val bean = buffBean.addBuff()//增加Buff,类型改为BuffBeanWithBuff
 bean.name//这个name的get和set就有了MutableState<T>的效果
 bean.removeBuff()//退回为BuffBean(可选方法,可以不使用)
+```
+
+Step 4.将ksp的代码生成目录加入源码目录
+
+在app模块目录内的build.gradle.kts内添加:
+
+```kotlin
+//如果你的是安卓项目,且未设置多渠道
+android {
+    buildTypes {
+        release {
+            kotlin {
+                sourceSets.main {
+                    kotlin.srcDir("build/generated/ksp/release/kotlin")
+                }
+            }
+        }
+        debug {
+            kotlin {
+                sourceSets.main {
+                    kotlin.srcDir("build/generated/ksp/debug/kotlin")
+                }
+            }
+        }
+    }
+    kotlin {
+        sourceSets.test {
+            kotlin.srcDir("build/generated/ksp/test/kotlin")
+        }
+    }
+}
+
+//如果你的是安卓项目,且设置了多渠道
+applicationVariants.all {
+    outputs.all {
+        val flavorAndBuildTypeName = name
+        kotlin {
+            sourceSets.main {
+                kotlin.srcDir(
+                    "build/generated/ksp/${
+                        flavorAndBuildTypeName.split("-").let {
+                            it.first() + it.last()[0].toUpperCase() + it.last().substring(1)
+                        }
+                    }/kotlin"
+                )
+            }
+        }
+    }
+}
+kotlin {
+    sourceSets.test {
+        kotlin.srcDir("build/generated/ksp/test/kotlin")
+    }
+}
+
+//如果你的是jvm等项目
+kotlin {
+    sourceSets.main {
+        kotlin.srcDir("build/generated/ksp/main/kotlin")
+    }
+    sourceSets.test {
+        kotlin.srcDir("build/generated/ksp/test/kotlin")
+    }
+}
 ```

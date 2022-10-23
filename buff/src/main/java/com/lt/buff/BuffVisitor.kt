@@ -52,7 +52,6 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
                     .find { it.shortName.getShortName() == buffName } != null
             val type = ksType.declaration.simpleName.getShortName()
             val nullable = if (ksType.nullability == Nullability.NULLABLE) "?" else ""
-            environment.logger.warn(type)
             //写入构造内的普通字段
             file.appendText("    ${if (it.isVal) "val" else "var"} $name: ${if (isBuffBean) "$type$suffix$nullable" else "$type$nullable"},\n")
             functionFields.add(FunctionFieldsInfo(name, true, isBuffBean))
