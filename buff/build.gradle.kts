@@ -1,6 +1,5 @@
 plugins {
-    id("java-library")
-    id("org.jetbrains.kotlin.jvm")
+    kotlin("multiplatform")
     id("maven-publish")
 }
 
@@ -8,8 +7,8 @@ group = "com.github.ltttttttttttt"
 version = "1.0.0"
 
 java {
-    withSourcesJar()
-    withJavadocJar()
+    //withSourcesJar()
+    //withJavadocJar()
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 }
@@ -20,11 +19,20 @@ publishing {
             groupId = "com.github.ltttttttttttt"
             artifactId = "library"
             version = "1.0.0"
-            from(components.getByName("java"))
+            from(components.getByName("kotlin"))
         }
     }
 }
 
-dependencies {
-    implementation("com.google.devtools.ksp:symbol-processing-api:$kspVersion")
+kotlin {
+    jvm()
+
+    sourceSets {
+        val commonMain by getting {
+            dependencies {
+                implementation("com.google.devtools.ksp:symbol-processing-api:$kspVersion")
+            }
+        }
+        val commonTest by getting
+    }
 }
