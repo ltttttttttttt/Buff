@@ -4,13 +4,11 @@ import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSVisitorVoid
-import com.google.devtools.ksp.symbol.Nullability
-import com.lt.buff.Buff
 import com.lt.buff.appendText
+import com.lt.buff.getKSTypeInfo
 import com.lt.buff.options.CustomOptionsInfo
 import com.lt.buff.options.FunctionFieldsInfo
 import com.lt.buff.options.KspOptions
-import com.lt.buff.w
 
 /**
  * creator: lt  2022/10/20  lt.dygzs@qq.com
@@ -18,7 +16,6 @@ import com.lt.buff.w
  * warning:
  */
 internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) : KSVisitorVoid() {
-    private val buffName = Buff::class.simpleName
     private val options = KspOptions(environment)
 
     /**
@@ -52,13 +49,7 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
         //遍历构造内的字段
         classDeclaration.primaryConstructor?.parameters?.forEach {
             val name = it.name?.getShortName() ?: ""
-            val ksType = it.type.resolve()
-            val isBuffBean =
-                ksType.declaration.annotations.toList()
-                    .find { it.shortName.getShortName() == buffName } != null
-            val typeName =
-                "${ksType.declaration.packageName.asString()}.${ksType.declaration.simpleName.asString()}"
-            val nullable = if (ksType.nullability == Nullability.NULLABLE) "?" else ""
+            val (ksType, isBuffBean, typeName, nullable) = getKSTypeInfo(it.type)
             //写入构造内的普通字段
             file.appendText("    ${if (it.isVal) "val" else "var"} $name: ${if (isBuffBean) "$typeName${options.suffix}$nullable" else "$typeName$nullable"},\n")
             functionFields.add(FunctionFieldsInfo(name, true, isBuffBean))
@@ -70,13 +61,7 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
                 val fieldName = it.simpleName.getShortName()
                 if (!it.isMutable)
                     throw RuntimeException("$originalClassName.$fieldName: It is meaningless for the field of val to change to the MutableState<T>")
-                val ksType = it.type.resolve()
-                val isBuffBean =
-                    ksType.declaration.annotations.toList()
-                        .find { it.shortName.getShortName() == buffName } != null
-                val typeName =
-                    "${ksType.declaration.packageName.asString()}.${ksType.declaration.simpleName.asString()}"
-                val nullable = if (ksType.nullability == Nullability.NULLABLE) "?" else ""
+                val (ksType, isBuffBean, typeName, nullable) = getKSTypeInfo(it.type)
                 val stateFieldName = "_${fieldName}_state"
                 val buffType =
                     if (isBuffBean) "$typeName${options.suffix}$nullable" else "$typeName$nullable"
