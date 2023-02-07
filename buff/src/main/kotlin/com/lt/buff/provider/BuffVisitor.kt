@@ -49,9 +49,9 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
         //遍历构造内的字段
         classDeclaration.primaryConstructor?.parameters?.forEach {
             val name = it.name?.getShortName() ?: ""
-            val (ksType, isBuffBean, typeName, nullable) = getKSTypeInfo(it.type)
+            val (ksType, isBuffBean, typeName, nullable, finallyTypeName) = getKSTypeInfo(it.type, options)
             //写入构造内的普通字段
-            file.appendText("    ${if (it.isVal) "val" else "var"} $name: ${if (isBuffBean) "$typeName${options.suffix}$nullable" else "$typeName$nullable"},\n")
+            file.appendText("    ${if (it.isVal) "val" else "var"} $name: $finallyTypeName,\n")
             functionFields.add(FunctionFieldsInfo(name, true, isBuffBean))
         }
         //遍历所有字段
@@ -61,14 +61,12 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
                 val fieldName = it.simpleName.getShortName()
                 if (!it.isMutable)
                     throw RuntimeException("$originalClassName.$fieldName: It is meaningless for the field of val to change to the MutableState<T>")
-                val (ksType, isBuffBean, typeName, nullable) = getKSTypeInfo(it.type)
+                val (ksType, isBuffBean, typeName, nullable, finallyTypeName) = getKSTypeInfo(it.type, options)
                 val stateFieldName = "_${fieldName}_state"
-                val buffType =
-                    if (isBuffBean) "$typeName${options.suffix}$nullable" else "$typeName$nullable"
                 //写入构造内的state字段
-                file.appendText("    ${options.getFieldSerializeTransientAnnotation()} val $stateFieldName: MutableState<$buffType> = null!!,\n")
+                file.appendText("    ${options.getFieldSerializeTransientAnnotation()} val $stateFieldName: MutableState<$finallyTypeName> = null!!,\n")
                 classFields.add(
-                    "    var $fieldName: $buffType = $stateFieldName.value\n" +
+                    "    var $fieldName: $finallyTypeName = $stateFieldName.value\n" +
                             "        get() {\n" +
                             "            $stateFieldName.value = field\n" +
                             "            return $stateFieldName.value\n" +

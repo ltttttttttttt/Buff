@@ -1,9 +1,10 @@
 package com.lt.buff
 
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
-import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSTypeReference
 import com.google.devtools.ksp.symbol.Nullability
+import com.lt.buff.options.KSTypeInfo
+import com.lt.buff.options.KspOptions
 import java.io.OutputStream
 
 /**
@@ -37,25 +38,33 @@ internal fun String?.w(environment: SymbolProcessorEnvironment) {
 /**
  * 获取ksType的信息
  */
-internal fun getKSTypeInfo(ks: KSTypeReference): KSTypeInfo {
+internal fun getKSTypeInfo(ks: KSTypeReference, options: KspOptions): KSTypeInfo {
+    //type对象
     val ksType = ks.resolve()
+    //类是否有Buff注解
     val isBuffBean =
         ksType.declaration.annotations.toList()
             .find { it.shortName.getShortName() == buffName } != null
+    //泛型 // TODO by lt 2023/2/7 23:00 处理buff问题,将需要转state的list转为statelist
+    var typeString = ksType.arguments.filter { it.type != null }.joinToString {
+        getKSTypeInfo(it.type!!, options).finallyTypeName
+    }
+    if (!typeString.isEmpty()) {
+        typeString = "<$typeString>"
+    }
+    //完整type字符串
     val typeName =
         "${ksType.declaration.packageName.asString()}.${ksType.declaration.simpleName.asString()}"
+    //是否可空
     val nullable = if (ksType.nullability == Nullability.NULLABLE) "?" else ""
+    //最后确定下来的type名字
+    val finallyTypeName =
+        if (isBuffBean) "$typeName${options.suffix}$typeString$nullable" else "$typeName$typeString$nullable"
     return KSTypeInfo(
         ksType,
         isBuffBean,
         typeName,
         nullable,
+        finallyTypeName,
     )
 }
-
-internal data class KSTypeInfo(
-    val ksType: KSType,
-    val isBuffBean: Boolean,
-    val typeName: String,
-    val nullable: String,
-)
