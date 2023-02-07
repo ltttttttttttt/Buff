@@ -35,10 +35,13 @@ fun ColumnScope.UseBuff() {
 @Buff
 class BuffBean(
     val id: Int? = null,
+    var info2: InfoBean? = null,
+    var infoList2: List<InfoBean>? = null,
 ) {
     var name: String? = null
     var info: InfoBean? = null
     var type: Type? = null
+    var infoList: List<InfoBean>? = null
 }
 
 @kotlinx.serialization.Serializable

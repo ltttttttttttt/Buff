@@ -10,6 +10,7 @@ import com.lt.buff.appendText
 import com.lt.buff.options.CustomOptionsInfo
 import com.lt.buff.options.FunctionFieldsInfo
 import com.lt.buff.options.KspOptions
+import com.lt.buff.w
 
 /**
  * creator: lt  2022/10/20  lt.dygzs@qq.com
@@ -156,6 +157,8 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
                 )
         }
         file.appendText("    )\n\n${options.getCustomInFile(::getInfo)}")
+        //写入Collection<addBuff>
+        file.appendText("\n\nfun Collection<$originalClassName>.addBuff() = map(BuffBean::addBuff)")
         file.close()
     }
 }

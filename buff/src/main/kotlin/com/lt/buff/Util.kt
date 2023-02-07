@@ -1,5 +1,6 @@
 package com.lt.buff
 
+import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import java.io.OutputStream
 
 /**
@@ -20,3 +21,10 @@ internal fun OutputStream.appendText(str: String) {
  */
 internal inline fun String?.ifNullOfEmpty(defaultValue: () -> String): String =
     if (this.isNullOrEmpty()) defaultValue() else this
+
+/**
+ * 打印日志
+ */
+internal fun String?.w(environment: SymbolProcessorEnvironment) {
+    environment.logger.warn("lllttt buff: ${this ?: "空字符串"}")
+}
