@@ -45,13 +45,32 @@ internal fun getKSTypeInfo(ks: KSTypeReference, options: KspOptions): KSTypeInfo
     val isBuffBean =
         ksType.declaration.annotations.toList()
             .find { it.shortName.getShortName() == buffName } != null
-    //泛型 // TODO by lt 2023/2/7 23:00 处理buff问题,将需要转state的list转为statelist
-    var typeString = ksType.arguments.filter { it.type != null }.joinToString {
-        getKSTypeInfo(it.type!!, options).finallyTypeName
-    }
-    if (!typeString.isEmpty()) {
-        typeString = "<$typeString>"
-    }
+    //泛型中是否包含Buff注解
+    var typeHaveBuff = false
+    //泛型(只支持List<T>) // TODO by lt 2023/2/7 23:00 将需要转state的list转为statelist
+    val typeString =
+        if (
+            ksType.arguments.size == 1
+            && ksType.toString().startsWith("List<")
+            && ksType.arguments.first().type != null
+        ) {
+            //处理List<T>,支持转state,且自动加Buff
+            val info = getKSTypeInfo(ksType.arguments.first().type!!, options)
+            typeHaveBuff = info.isBuffBean
+            val finallyTypeName = info.finallyTypeName
+            if (finallyTypeName.isNotEmpty())
+                "<$finallyTypeName>"
+            else
+                finallyTypeName
+        } else if (ksType.arguments.isEmpty())
+            ""//无泛型
+        else {
+            //其他泛型,原样输出
+            ksType.arguments.filter { it.type != null }.joinToString(prefix = "<", postfix = ">") {
+                val info = getKSTypeInfo(it.type!!, options)
+                "${info.typeName}${info.typeString}${info.nullable}"
+            }
+        }
     //完整type字符串
     val typeName =
         "${ksType.declaration.packageName.asString()}.${ksType.declaration.simpleName.asString()}"
@@ -62,9 +81,11 @@ internal fun getKSTypeInfo(ks: KSTypeReference, options: KspOptions): KSTypeInfo
         if (isBuffBean) "$typeName${options.suffix}$typeString$nullable" else "$typeName$typeString$nullable"
     return KSTypeInfo(
         ksType,
-        isBuffBean,
+        //自身或泛型包含Buff注解
+        isBuffBean || typeHaveBuff,
         typeName,
         nullable,
         finallyTypeName,
+        typeString,
     )
 }

@@ -13,4 +13,5 @@ internal data class KSTypeInfo(
     val typeName: String,
     val nullable: String,
     val finallyTypeName: String,
+    val typeString: String,
 )

@@ -141,7 +141,9 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
         }
         file.appendText("    )\n\n${options.getCustomInFile(::getInfo)}")
         //写入Collection<addBuff>
-        file.appendText("\n\nfun Collection<$originalClassName>.addBuff() = map(BuffBean::addBuff)")
+        file.appendText("\n\nfun Collection<$originalClassName>.addBuff() = map($originalClassName::addBuff)")
+        //写入Collection<removeBuff>
+        file.appendText("\n\nfun Collection<$className>.removeBuff() = map($className::removeBuff)")
         file.close()
     }
 }
