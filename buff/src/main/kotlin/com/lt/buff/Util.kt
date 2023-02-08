@@ -37,8 +37,11 @@ internal fun String?.w(environment: SymbolProcessorEnvironment) {
 
 /**
  * 获取ksType的信息
+ * [ks] KSTypeReference信息
+ * [options] 用户的配置
+ * [isFirstFloor] 是否是最外层,用于判断泛型
  */
-internal fun getKSTypeInfo(ks: KSTypeReference, options: KspOptions): KSTypeInfo {
+internal fun getKSTypeInfo(ks: KSTypeReference, options: KspOptions, isFirstFloor: Boolean = true): KSTypeInfo {
     //type对象
     val ksType = ks.resolve()
     //类是否有Buff注解
@@ -50,12 +53,13 @@ internal fun getKSTypeInfo(ks: KSTypeReference, options: KspOptions): KSTypeInfo
     //泛型(只支持List<T>) // TODO by lt 2023/2/7 23:00 将需要转state的list转为statelist
     val typeString =
         if (
-            ksType.arguments.size == 1
+            isFirstFloor
+            && ksType.arguments.size == 1
             && ksType.toString().startsWith("List<")
             && ksType.arguments.first().type != null
         ) {
             //处理List<T>,支持转state,且自动加Buff
-            val info = getKSTypeInfo(ksType.arguments.first().type!!, options)
+            val info = getKSTypeInfo(ksType.arguments.first().type!!, options, false)
             typeHaveBuff = info.isBuffBean
             val finallyTypeName = info.finallyTypeName
             if (finallyTypeName.isNotEmpty())
@@ -67,7 +71,7 @@ internal fun getKSTypeInfo(ks: KSTypeReference, options: KspOptions): KSTypeInfo
         else {
             //其他泛型,原样输出
             ksType.arguments.filter { it.type != null }.joinToString(prefix = "<", postfix = ">") {
-                val info = getKSTypeInfo(it.type!!, options)
+                val info = getKSTypeInfo(it.type!!, options, false)
                 "${info.typeName}${info.typeString}${info.nullable}"
             }
         }
