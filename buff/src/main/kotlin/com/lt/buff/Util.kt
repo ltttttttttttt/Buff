@@ -50,7 +50,9 @@ internal fun getKSTypeInfo(ks: KSTypeReference, options: KspOptions, isFirstFloo
             .find { it.shortName.getShortName() == buffName } != null
     //泛型中是否包含Buff注解
     var typeHaveBuff = false
-    //泛型(只支持List<T>) // TODO by lt 2023/2/7 23:00 将需要转state的list转为statelist
+    //是否是List<T>,后续在需要的地方会将List<T>转换为mutableStateListOf()
+    var isList = false
+    //泛型(只支持List<T>)
     val typeString =
         if (
             isFirstFloor
@@ -58,6 +60,7 @@ internal fun getKSTypeInfo(ks: KSTypeReference, options: KspOptions, isFirstFloo
             && ksType.toString().startsWith("List<")
             && ksType.arguments.first().type != null
         ) {
+            isList = true
             //处理List<T>,支持转state,且自动加Buff
             val info = getKSTypeInfo(ksType.arguments.first().type!!, options, false)
             typeHaveBuff = info.isBuffBean
@@ -91,5 +94,6 @@ internal fun getKSTypeInfo(ks: KSTypeReference, options: KspOptions, isFirstFloo
         nullable,
         finallyTypeName,
         typeString,
+        isList
     )
 }

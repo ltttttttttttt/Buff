@@ -36,7 +36,10 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
         file.appendText("package $packageName\n\n")
         file.appendText(
             "import androidx.compose.runtime.MutableState\n" +
-                    "import androidx.compose.runtime.mutableStateOf\n\n"
+                    "import androidx.compose.runtime.mutableStateListOf\n" +
+                    "import androidx.compose.runtime.mutableStateOf\n" +
+                    "import androidx.compose.runtime.snapshots.SnapshotStateList\n" +
+                    "import androidx.compose.runtime.toMutableStateList\n\n"
         )
         file.appendText(
             "${options.getClassSerializeAnnotation()}\n" +
@@ -52,7 +55,7 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
             val (ksType, isBuffBean, typeName, nullable, finallyTypeName) = getKSTypeInfo(it.type, options)
             //写入构造内的普通字段
             file.appendText("    ${if (it.isVal) "val" else "var"} $name: $finallyTypeName,\n")
-            functionFields.add(FunctionFieldsInfo(name, true, isBuffBean))
+            functionFields.add(FunctionFieldsInfo(name, true, isBuffBean, nullable))
         }
         //遍历所有字段
         classDeclaration.getAllProperties().forEach {
@@ -61,22 +64,30 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
                 val fieldName = it.simpleName.getShortName()
                 if (!it.isMutable)
                     throw RuntimeException("$originalClassName.$fieldName: It is meaningless for the field of val to change to the MutableState<T>")
-                val (ksType, isBuffBean, typeName, nullable, finallyTypeName) = getKSTypeInfo(it.type, options)
+                val info = getKSTypeInfo(it.type, options)
+                val (ksType, isBuffBean, typeName, nullable, finallyTypeName) = info
                 val stateFieldName = "_${fieldName}_state"
-                //写入构造内的state字段
-                file.appendText("    ${options.getFieldSerializeTransientAnnotation()} val $stateFieldName: MutableState<$finallyTypeName> = null!!,\n")
-                classFields.add(
-                    "    var $fieldName: $finallyTypeName = $stateFieldName.value\n" +
-                            "        get() {\n" +
-                            "            $stateFieldName.value = field\n" +
-                            "            return $stateFieldName.value\n" +
-                            "        }\n" +
-                            "        set(value) {\n" +
-                            "            field = value\n" +
-                            "            $stateFieldName.value = value\n" +
-                            "        }\n"
-                )
-                functionFields.add(FunctionFieldsInfo(fieldName, false, isBuffBean))
+                //写入构造内的state字段,普通state或list state
+                if (!info.isList) {
+                    file.appendText("    ${options.getFieldSerializeTransientAnnotation()} val $stateFieldName: MutableState<$finallyTypeName> = null!!,\n")
+                    classFields.add(
+                        "    var $fieldName: $finallyTypeName = $stateFieldName.value\n" +
+                                "        get() {\n" +
+                                "            $stateFieldName.value = field\n" +
+                                "            return $stateFieldName.value\n" +
+                                "        }\n" +
+                                "        set(value) {\n" +
+                                "            field = value\n" +
+                                "            $stateFieldName.value = value\n" +
+                                "        }\n"
+                    )
+                } else {
+                    file.appendText("    ${options.getFieldSerializeTransientAnnotation()} val $stateFieldName: SnapshotStateList${info.typeString} = null!!,\n")
+                    classFields.add(
+                        "    val $fieldName: $finallyTypeName = $stateFieldName\n"
+                    )
+                }
+                functionFields.add(FunctionFieldsInfo(fieldName, false, isBuffBean, nullable, info.isList))
             }
         }
         file.appendText(") {\n")
@@ -84,7 +95,6 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
         fun getInfo() = CustomOptionsInfo(
             originalClassName, className
         )
-
         //写入非构造内的字段
         classFields.forEach(file::appendText)
         //写入removeBuff
@@ -94,7 +104,7 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
                         functionFields.filter { it.isInTheConstructor }
                             .map {
                                 if (it.isBuffBean)
-                                    "${it.fieldName}?.removeBuff()"
+                                    "${it.fieldName}${it.nullable}.removeBuff()"
                                 else
                                     it.fieldName
                             }
@@ -102,12 +112,13 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
                     }).also {\n"
         )
         functionFields.filter { !it.isInTheConstructor }.forEach {
+            val isList = if (it.isList) it.nullable + ".toList()" else ""
             file.appendText(
                 "            it.${it.fieldName} = ${
                     if (it.isBuffBean)
-                        "${it.fieldName}?.removeBuff()"
+                        "${it.fieldName}$isList${it.nullable}.removeBuff()"
                     else
-                        it.fieldName
+                        it.fieldName + isList
                 }\n"
             )
         }
@@ -124,26 +135,40 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
                 file.appendText(
                     "        ${
                         if (it.isBuffBean)
-                            "${it.fieldName}?.addBuff()"
+                            "${it.fieldName}${it.nullable}.addBuff()"
                         else
                             it.fieldName
                     },\n"
                 )
-            else
-                file.appendText(
-                    "        mutableStateOf(${
-                        if (it.isBuffBean)
-                            "${it.fieldName}?.addBuff()"
-                        else
-                            it.fieldName
-                    }),\n"
-                )
+            else {
+                if (!it.isList) {
+                    file.appendText(
+                        "        mutableStateOf(${
+                            if (it.isBuffBean)
+                                "${it.fieldName}${it.nullable}.addBuff()"
+                            else
+                                it.fieldName
+                        }),\n"
+                    )
+                } else {
+                    file.appendText(
+                        "        ${
+                            if (it.isBuffBean)
+                                "${it.fieldName}${it.nullable}.addBuff()"
+                            else
+                                it.fieldName
+                        }${it.nullable}.toMutableStateList() ?: mutableStateListOf(),\n"
+                    )
+                }
+            }
         }
         file.appendText("    )\n\n${options.getCustomInFile(::getInfo)}")
         //写入Collection<addBuff>
-        file.appendText("\n\nfun Collection<$originalClassName>.addBuff() = map($originalClassName::addBuff)")
+        file.appendText("\n\nfun Collection<$originalClassName>.addBuff() = map { it.addBuff() }")
+        file.appendText("\nfun Collection<$originalClassName?>.addBuff() = map { it?.addBuff() }")
         //写入Collection<removeBuff>
-        file.appendText("\n\nfun Collection<$className>.removeBuff() = map($className::removeBuff)")
+        file.appendText("\n\nfun Collection<$className>.removeBuff() = map { it.removeBuff() }")
+        file.appendText("\nfun Collection<$className?>.removeBuff() = map { it?.removeBuff() }")
         file.close()
     }
 }

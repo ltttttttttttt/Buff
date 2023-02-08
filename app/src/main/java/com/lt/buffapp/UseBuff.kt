@@ -40,8 +40,9 @@ class BuffBean(
 ) {
     var name: String? = null
     var info: InfoBean? = null
+    var infoBean: InfoBean=InfoBean()
     var type: Type? = null
-    var infoList: List<InfoBean>? = null
+    var infoList: List<InfoBean?>? = null
     var list: List<String>? = null
     var infoListList: List<List<InfoBean>>? = null
     var map: Map<String, InfoBean>? = null
