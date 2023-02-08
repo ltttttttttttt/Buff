@@ -9,6 +9,7 @@ import com.lt.buff.getKSTypeInfo
 import com.lt.buff.options.CustomOptionsInfo
 import com.lt.buff.options.FunctionFieldsInfo
 import com.lt.buff.options.KspOptions
+import com.lt.buff.w
 
 /**
  * creator: lt  2022/10/20  lt.dygzs@qq.com
@@ -23,8 +24,10 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
      */
     override fun visitClassDeclaration(classDeclaration: KSClassDeclaration, data: Unit) {
         //获取class信息并创建kt文件
-        val packageName = classDeclaration.containingFile!!.packageName.asString()
+        val packageName = classDeclaration.packageName.asString()
         val originalClassName = classDeclaration.simpleName.asString()
+        val fullName = classDeclaration.qualifiedName?.asString()
+            ?: (classDeclaration.packageName.asString() + classDeclaration.simpleName.asString())
         val className = "$originalClassName${options.suffix}"
         val file = environment.codeGenerator.createNewFile(
             Dependencies(
@@ -99,8 +102,8 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
         classFields.forEach(file::appendText)
         //写入removeBuff
         file.appendText(
-            "\n    fun removeBuff(): $originalClassName =\n" +
-                    "        $originalClassName(${
+            "\n    fun removeBuff(): $fullName =\n" +
+                    "        $fullName(${
                         functionFields.filter { it.isInTheConstructor }
                             .map {
                                 if (it.isBuffBean)
@@ -127,7 +130,7 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
         file.appendText("}\n\n")
         //写入addBuff
         file.appendText(
-            "fun $originalClassName.addBuff(): $className =\n" +
+            "fun $fullName.addBuff(): $className =\n" +
                     "    $className(\n"
         )
         functionFields.forEach {
@@ -164,11 +167,15 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
         }
         file.appendText("    )\n\n${options.getCustomInFile(::getInfo)}")
         //写入Collection<addBuff>
-        file.appendText("\n\nfun Collection<$originalClassName>.addBuff() = map { it.addBuff() }")
-        file.appendText("\nfun Collection<$originalClassName?>.addBuff() = map { it?.addBuff() }")
+        file.appendText(
+            "\n\nfun Collection<$fullName?>.addBuff() =\n" +
+                    "    map { it?.addBuff() } as List<$className>"
+        )
         //写入Collection<removeBuff>
-        file.appendText("\n\nfun Collection<$className>.removeBuff() = map { it.removeBuff() }")
-        file.appendText("\nfun Collection<$className?>.removeBuff() = map { it?.removeBuff() }")
+        file.appendText(
+            "\n\nfun Collection<$className?>.removeBuff() =\n" +
+                    "    map { it?.removeBuff() } as List<$fullName>"
+        )
         file.close()
     }
 }
