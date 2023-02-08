@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import com.lt.buff.Buff
 import com.lt.buffapp.ui.theme.Type
+import kotlinx.serialization.Serializable
 
 /**
  * creator: lt  2022/10/19  lt.dygzs@qq.com
@@ -40,7 +41,7 @@ class BuffBean(
 ) {
     var name: String? = null
     var info: InfoBean? = null
-    var infoBean: InfoBean=InfoBean()
+    var infoBean: InfoBean = InfoBean()
     var type: Type? = null
     var infoList: List<InfoBean?>? = null
     var list: List<String>? = null
@@ -54,4 +55,10 @@ class InfoBean(
     val age: Int? = null,
 ) {
     var nick: String? = null
+
+    @Serializable
+    @Buff
+    class InnerClass {
+        var name: String = ""
+    }
 }
