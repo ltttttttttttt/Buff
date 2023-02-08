@@ -1,5 +1,6 @@
 plugins {
-    kotlin("multiplatform")
+    kotlin("jvm")
+    id("java-library")
     id("maven-publish")
 }
 
@@ -24,15 +25,6 @@ publishing {
     }
 }
 
-kotlin {
-    jvm()
-
-    sourceSets {
-        val commonMain by getting {
-            dependencies {
-                implementation("com.google.devtools.ksp:symbol-processing-api:$kspVersion")
-            }
-        }
-        val commonTest by getting
-    }
+dependencies {
+    implementation("com.google.devtools.ksp:symbol-processing-api:$kspVersion")
 }

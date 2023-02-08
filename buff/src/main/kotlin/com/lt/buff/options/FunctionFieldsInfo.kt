@@ -9,4 +9,6 @@ internal class FunctionFieldsInfo(
     val fieldName: String,
     val isInTheConstructor: Boolean,
     val isBuffBean: Boolean,
+    val nullable: String,
+    val isList: Boolean = false,
 )
