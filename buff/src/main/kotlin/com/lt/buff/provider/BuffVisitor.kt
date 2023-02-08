@@ -9,7 +9,6 @@ import com.lt.buff.getKSTypeInfo
 import com.lt.buff.options.CustomOptionsInfo
 import com.lt.buff.options.FunctionFieldsInfo
 import com.lt.buff.options.KspOptions
-import com.lt.buff.w
 
 /**
  * creator: lt  2022/10/20  lt.dygzs@qq.com
@@ -87,7 +86,7 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
                 } else {
                     file.appendText("    ${options.getFieldSerializeTransientAnnotation()} val $stateFieldName: SnapshotStateList${info.typeString} = null!!,\n")
                     classFields.add(
-                        "    val $fieldName: $finallyTypeName = $stateFieldName\n"
+                        "    val $fieldName: $typeName${info.typeString} = $stateFieldName\n"
                     )
                 }
                 functionFields.add(FunctionFieldsInfo(fieldName, false, isBuffBean, nullable, info.isList))
