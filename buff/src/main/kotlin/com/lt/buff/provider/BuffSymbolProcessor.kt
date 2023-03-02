@@ -20,7 +20,7 @@ internal class BuffSymbolProcessor(private val environment: SymbolProcessorEnvir
         resolver.getSymbolsWithAnnotation(Buff::class.qualifiedName!!)
             .toList()
             .forEach {
-                if (it is KSClassDeclaration) {
+                if (it is KSClassDeclaration && it.classKind.type == "class") {
                     if (!it.validate()) ret.add(it)
                     else it.accept(BuffVisitor(environment), Unit)//处理符号
                 }
