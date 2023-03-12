@@ -6,7 +6,7 @@
 
 <p align="center">
 <img src="https://img.shields.io/badge/license-Apache%202-blue.svg?maxAge=2592000">
-<img src="https://jitpack.io/v/ltttttttttttt/Buff.svg"/>
+<img src="https://img.shields.io/maven-central/v/io.github.ltttttttttttt/Buff"/>
 </p>
 
 <div align="center">us English | <a href="https://github.com/ltttttttttttt/Buff/blob/main/README_CN.md">cn 简体中文</a></div>
@@ -21,38 +21,47 @@
 
 ## How to use
 
-Step 1.Root dir, build.gradle.kts add:
+Step 1 and 2.add dependencies:
 
-```kotlin
-buildscript {
-    repositories {
-        maven("https://jitpack.io")//this
-        ...
-    }
-}
+version
+= [![](https://img.shields.io/maven-central/v/io.github.ltttttttttttt/LazyPeopleHttp)](https://repo1.maven.org/maven2/io/github/ltttttttttttt/LazyPeopleHttp/)
 
-allprojects {
-    repositories {
-        maven("https://jitpack.io")//this
-        ...
-    }
-}
-```
-
-Step 2.Your app dir, build.gradle.kts add:
-
-version = [![](https://jitpack.io/v/ltttttttttttt/Buff.svg)](https://jitpack.io/#ltttttttttttt/Buff)
+* If it is a single platform, add it to build.gradle.kts in the app module directory
 
 ```kotlin
 plugins {
     ...
-    id("com.google.devtools.ksp") version "1.7.10-1.0.6"//this, The left 1.7.10 corresponds to your the Kotlin version,more version: https://github.com/google/ksp/releases
+    id("com.google.devtools.ksp") version "1.7.10-1.0.6"//this,The left 1.7.10 corresponds to your the Kotlin version,more version: https://github.com/google/ksp/releases
 }
 
 dependencies {
     ...
-    implementation("com.github.ltttttttttttt:Buff:$version")//this, such as 0.0.3
-    ksp("com.github.ltttttttttttt:Buff:$version")//this, such as 0.0.3
+    implementation("io.github.ltttttttttttt:Buff-lib:$version")//this,such as 1.0.0
+    ksp("io.github.ltttttttttttt:Buff:$version")//this,such as 1.0.0
+}
+```
+
+* If it is multi-platform, add it to build.gradle.kts in the common module directory
+
+```kotlin
+plugins {
+    ...
+    id("com.google.devtools.ksp") version "1.7.10-1.0.6"
+}
+
+...
+val commonMain by getting {
+    //Configure the ksp generation directory
+    kotlin.srcDir("build/generated/ksp/metadata/commonMain/kotlin")
+    dependencies {
+        ...
+        api("io.github.ltttttttttttt:Buff-lib:$version")//this,such as 1.0.0
+    }
+}
+
+...
+dependencies {
+    add("kspCommonMainMetadata", "io.github.ltttttttttttt:Buff:$version")
 }
 ```
 
@@ -79,7 +88,7 @@ bean.name//The name's getter and setter have the effect of MutableState<T>
 bean.removeBuff()//Fallback to BuffBean(optional)
 ```
 
-Step 4.Add ksp dir to the srcDir
+Step 4.Add ksp dir to the srcDir(single platform)
 
 Your app dir, build.gradle.kts add:
 

@@ -1,3 +1,7 @@
 rootProject.name = "BuffApp"
 include(":app")
-include(":buff")
+include(":Buff")
+include(":Buff-lib")
+
+
+includeBuild("convention-plugins")
