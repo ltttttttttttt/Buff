@@ -24,7 +24,7 @@
 Step 1 and 2.add dependencies:
 
 version
-= [![](https://img.shields.io/maven-central/v/io.github.ltttttttttttt/LazyPeopleHttp)](https://repo1.maven.org/maven2/io/github/ltttttttttttt/LazyPeopleHttp/)
+= [![](https://img.shields.io/maven-central/v/io.github.ltttttttttttt/Buff)](https://repo1.maven.org/maven2/io/github/ltttttttttttt/Buff/)
 
 * If it is a single platform, add it to build.gradle.kts in the app module directory
 
