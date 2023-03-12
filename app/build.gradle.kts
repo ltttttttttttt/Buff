@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.lt.buffapp"
-    compileSdk = 32
+    compileSdk = 33
 
     defaultConfig {
         applicationId = "com.lt.buffapp"
@@ -80,8 +80,8 @@ android {
 }
 
 dependencies {
-    implementation(project(":buff"))
-    ksp(project(":buff"))
+    implementation(project(":Buff-lib"))
+    ksp(project(":Buff"))
 
     implementation("androidx.core:core-ktx:1.7.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.3.1")
