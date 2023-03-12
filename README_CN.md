@@ -24,7 +24,7 @@
 Step 1和2.添加依赖:
 
 version
-= [![](https://img.shields.io/maven-central/v/io.github.ltttttttttttt/LazyPeopleHttp)](https://repo1.maven.org/maven2/io/github/ltttttttttttt/LazyPeopleHttp/)
+= [![](https://img.shields.io/maven-central/v/io.github.ltttttttttttt/Buff)](https://repo1.maven.org/maven2/io/github/ltttttttttttt/Buff/)
 
 * 如果是单平台,在app模块目录内的build.gradle.kts内添加
 
