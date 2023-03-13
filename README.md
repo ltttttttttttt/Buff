@@ -65,7 +65,7 @@ dependencies {
 }
 ```
 
-Step 3.Use BUff
+Step 3.Use Buff
 
 Add the @Buff to your bean, call the addBuff() transform to the new Any, The attribute (such as
 name) not in the constructor will be automatically converted to MutableState&lt;T&gt;

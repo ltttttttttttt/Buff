@@ -65,7 +65,7 @@ dependencies {
 }
 ```
 
-Step 3.使用BUff注解
+Step 3.使用Buff注解
 
 给你的bean类加上@Buff注解,然后调用类的addBuff方法转换为新类,会将其中非构造中的属性(如name)自动转换为MutableState&lt;T&gt;
 
