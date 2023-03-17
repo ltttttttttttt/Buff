@@ -16,8 +16,5 @@
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.lt.lazy_people_http">
-
-    <uses-permission android:name="android.permission.INTERNET"/>
-
+    package="com.lt.buff">
 </manifest>
