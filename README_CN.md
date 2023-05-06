@@ -151,9 +151,9 @@ kotlin {
 }
 ```
 
-Step 5.配置
+Step 5.可选配置
 
-本项目对序列化的默认支持为:kotlinx-serialization,如需修改,在app模块目录内的build.gradle.kts内添加:
+本项目对序列化的默认支持为:kotlinx-serialization,如使用其他序列化支持,则修改,在app模块目录内的build.gradle.kts内添加:
 
 ```kotlin
 ksp {

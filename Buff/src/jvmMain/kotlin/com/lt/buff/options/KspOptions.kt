@@ -9,7 +9,7 @@ import com.lt.buff.ifNullOfEmpty
  * warning:
  */
 internal class KspOptions(environment: SymbolProcessorEnvironment) {
-    val suffix = "WithBuff"//后缀
+    private val suffix = "WithBuff"//后缀
     private val options = environment.options
     private val classSerializeAnnotation = "classSerializeAnnotation$suffix"
     private val fieldSerializeTransientAnnotation = "fieldSerializeTransientAnnotation$suffix"
