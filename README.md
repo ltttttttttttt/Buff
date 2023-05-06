@@ -152,9 +152,9 @@ kotlin {
 }
 ```
 
-Step 5.Config
+Step 5.Optional configuration
 
-Serialize of this project uses kotlinx-serialization by default, To modify, Your app dir,
+Serialize of this project uses kotlinx-serialization by default, If using other serialization support, modify it, Your app dir,
 build.gradle.kts add:
 
 ```kotlin
