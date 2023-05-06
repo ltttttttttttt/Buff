@@ -5,6 +5,7 @@
 <p>⚠️Non mainstream warning:This item violates 'Unique trusted data source' and 'FP',If the content on this page causes your discomfort,please press Ctrl+W</p>
 
 <p align="center">
+<img src="https://img.shields.io/badge/Kotlin-Multiplatform-%237f52ff?logo=kotlin">
 <img src="https://img.shields.io/badge/license-Apache%202-blue.svg?maxAge=2592000">
 <img src="https://img.shields.io/maven-central/v/io.github.ltttttttttttt/Buff"/>
 </p>
