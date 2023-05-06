@@ -5,6 +5,7 @@
 <p>⚠️非主流警告:此项目违背了'唯一可信数据源'和'函数式编程思想',若此页面所述内容引起了您的不适,请按下Ctrl+W</p>
 
 <p align="center">
+<img src="https://img.shields.io/badge/Kotlin-Multiplatform-%237f52ff?logo=kotlin">
 <img src="https://img.shields.io/badge/license-Apache%202-blue.svg?maxAge=2592000">
 <img src="https://img.shields.io/maven-central/v/io.github.ltttttttttttt/Buff"/>
 </p>
