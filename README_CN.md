@@ -47,7 +47,7 @@ dependencies {
 ```kotlin
 plugins {
     ...
-    id("com.google.devtools.ksp") version "1.8.20-1.0.10"//this,前面的1.7.10对应你的kotlin版本,更多版本参考: https://github.com/google/ksp/releases
+    id("com.google.devtools.ksp") version "1.8.20-1.0.10"//this,前面的1.8.20对应你的kotlin版本,更多版本参考: https://github.com/google/ksp/releases
 }
 
 ...
