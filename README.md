@@ -32,13 +32,13 @@ version
 ```kotlin
 plugins {
     ...
-    id("com.google.devtools.ksp") version "1.7.10-1.0.6"//this,The left 1.7.10 corresponds to your the Kotlin version,more version: https://github.com/google/ksp/releases
+    id("com.google.devtools.ksp") version "1.8.20-1.0.10"//this,The left 1.8.20 corresponds to your the Kotlin version,more version: https://github.com/google/ksp/releases
 }
 
 dependencies {
     ...
-    implementation("io.github.ltttttttttttt:Buff-lib:$version")//this,such as 1.0.0
-    ksp("io.github.ltttttttttttt:Buff:$version")//this,such as 1.0.0
+    implementation("io.github.ltttttttttttt:Buff-lib:$version")//this,such as 0.1.2
+    ksp("io.github.ltttttttttttt:Buff:$version")//this,such as 0.1.2
 }
 ```
 
@@ -47,16 +47,14 @@ dependencies {
 ```kotlin
 plugins {
     ...
-    id("com.google.devtools.ksp") version "1.7.10-1.0.6"
+    id("com.google.devtools.ksp") version "1.8.20-1.0.10"
 }
 
 ...
 val commonMain by getting {
-    //Configure the ksp generation directory
-    kotlin.srcDir("build/generated/ksp/metadata/commonMain/kotlin")
     dependencies {
         ...
-        api("io.github.ltttttttttttt:Buff-lib:$version")//this,such as 1.0.0
+        api("io.github.ltttttttttttt:Buff-lib:$version")//this,such as 0.1.2
     }
 }
 
@@ -89,69 +87,9 @@ bean.name//The name's getter and setter have the effect of MutableState<T>
 bean.removeBuff()//Fallback to BuffBean(optional)
 ```
 
-Step 4.Add ksp dir to the srcDir(single platform)
+Step 4.If you are using a version of ksp less than 1.0.9, the following configuration is required:
 
-Your app dir, build.gradle.kts add:
-
-```kotlin
-//If your project is the android, and the productFlavors is not set
-android {
-    buildTypes {
-        release {
-            kotlin {
-                sourceSets.main {
-                    kotlin.srcDir("build/generated/ksp/release/kotlin")
-                }
-            }
-        }
-        debug {
-            kotlin {
-                sourceSets.main {
-                    kotlin.srcDir("build/generated/ksp/debug/kotlin")
-                }
-            }
-        }
-    }
-    kotlin {
-        sourceSets.test {
-            kotlin.srcDir("build/generated/ksp/test/kotlin")
-        }
-    }
-}
-
-//If your project is the android, and the productFlavors is set
-applicationVariants.all {
-    outputs.all {
-        val flavorAndBuildTypeName = name
-        kotlin {
-            sourceSets.main {
-                kotlin.srcDir(
-                    "build/generated/ksp/${
-                        flavorAndBuildTypeName.split("-").let {
-                            it.first() + it.last()[0].toUpperCase() + it.last().substring(1)
-                        }
-                    }/kotlin"
-                )
-            }
-        }
-    }
-}
-kotlin {
-    sourceSets.test {
-        kotlin.srcDir("build/generated/ksp/test/kotlin")
-    }
-}
-
-//If your project is the jvm or more
-kotlin {
-    sourceSets.main {
-        kotlin.srcDir("build/generated/ksp/main/kotlin")
-    }
-    sourceSets.test {
-        kotlin.srcDir("build/generated/ksp/test/kotlin")
-    }
-}
-```
+<a href="https://github.com/ltttttttttttt/Buff/blob/main/README_KSP_SRC.md">Ksp configuration</a>
 
 Step 5.Optional configuration
 

@@ -32,13 +32,13 @@ version
 ```kotlin
 plugins {
     ...
-    id("com.google.devtools.ksp") version "1.7.10-1.0.6"//this,前面的1.7.10对应你的kotlin版本,更多版本参考: https://github.com/google/ksp/releases
+    id("com.google.devtools.ksp") version "1.8.20-1.0.10"//this,前面的1.8.20对应你的kotlin版本,更多版本参考: https://github.com/google/ksp/releases
 }
 
 dependencies {
     ...
-    implementation("io.github.ltttttttttttt:Buff-lib:$version")//this,比如1.0.0
-    ksp("io.github.ltttttttttttt:Buff:$version")//this,比如1.0.0
+    implementation("io.github.ltttttttttttt:Buff-lib:$version")//this,比如0.1.2
+    ksp("io.github.ltttttttttttt:Buff:$version")//this,比如0.1.2
 }
 ```
 
@@ -47,16 +47,14 @@ dependencies {
 ```kotlin
 plugins {
     ...
-    id("com.google.devtools.ksp") version "1.7.10-1.0.6"//this,前面的1.7.10对应你的kotlin版本,更多版本参考: https://github.com/google/ksp/releases
+    id("com.google.devtools.ksp") version "1.8.20-1.0.10"//this,前面的1.7.10对应你的kotlin版本,更多版本参考: https://github.com/google/ksp/releases
 }
 
 ...
 val commonMain by getting {
-    //配置ksp生成目录
-    kotlin.srcDir("build/generated/ksp/metadata/commonMain/kotlin")
     dependencies {
         ...
-        api("io.github.ltttttttttttt:Buff-lib:$version")//this,比如1.0.0
+        api("io.github.ltttttttttttt:Buff-lib:$version")//this,比如0.1.2
     }
 }
 
@@ -88,69 +86,9 @@ bean.name//这个name的get和set就有了MutableState<T>的效果
 bean.removeBuff()//退回为BuffBean(可选方法,可以不使用)
 ```
 
-Step 4.将ksp的代码生成目录加入源码目录(如果是单平台)
+Step 4.如果你使用的ksp版本小于1.0.9则需要以下配置:
 
-在app模块目录内的build.gradle.kts内添加:
-
-```kotlin
-//如果你的是安卓项目,且未设置多渠道
-android {
-    buildTypes {
-        release {
-            kotlin {
-                sourceSets.main {
-                    kotlin.srcDir("build/generated/ksp/release/kotlin")
-                }
-            }
-        }
-        debug {
-            kotlin {
-                sourceSets.main {
-                    kotlin.srcDir("build/generated/ksp/debug/kotlin")
-                }
-            }
-        }
-    }
-    kotlin {
-        sourceSets.test {
-            kotlin.srcDir("build/generated/ksp/test/kotlin")
-        }
-    }
-}
-
-//如果你的是安卓项目,且设置了多渠道
-applicationVariants.all {
-    outputs.all {
-        val flavorAndBuildTypeName = name
-        kotlin {
-            sourceSets.main {
-                kotlin.srcDir(
-                    "build/generated/ksp/${
-                        flavorAndBuildTypeName.split("-").let {
-                            it.first() + it.last()[0].toUpperCase() + it.last().substring(1)
-                        }
-                    }/kotlin"
-                )
-            }
-        }
-    }
-}
-kotlin {
-    sourceSets.test {
-        kotlin.srcDir("build/generated/ksp/test/kotlin")
-    }
-}
-
-//如果你的是jvm等项目
-kotlin {
-    sourceSets.main {
-        kotlin.srcDir("build/generated/ksp/main/kotlin")
-    }
-    sourceSets.test {
-        kotlin.srcDir("build/generated/ksp/test/kotlin")
-    }
-}
-```
+<a href="https://github.com/ltttttttttttt/Buff/blob/main/README_KSP_SRC_CN.md">ksp配置</a>
 
 Step 5.可选配置
 
