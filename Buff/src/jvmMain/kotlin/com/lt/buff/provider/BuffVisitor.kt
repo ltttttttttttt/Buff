@@ -54,7 +54,10 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
         //遍历构造内的字段
         classDeclaration.primaryConstructor?.parameters?.forEach {
             val name = it.name?.getShortName() ?: ""
-            val (ksType, isBuffBean, typeName, nullable, finallyTypeName) = getKSTypeInfo(it.type, options)
+            val (ksType, isBuffBean, typeName, nullable, finallyTypeName) = getKSTypeInfo(
+                it.type,
+                options
+            )
             //写入构造内的普通字段
             file.appendText("    ${if (it.isVal) "val" else "var"} $name: $finallyTypeName,\n")
             functionFields.add(FunctionFieldsInfo(name, true, isBuffBean, nullable))
@@ -89,7 +92,15 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
                         "    val $fieldName: $typeName${info.typeString} = $stateFieldName\n"
                     )
                 }
-                functionFields.add(FunctionFieldsInfo(fieldName, false, isBuffBean, nullable, info.isList))
+                functionFields.add(
+                    FunctionFieldsInfo(
+                        fieldName,
+                        false,
+                        isBuffBean,
+                        nullable,
+                        info.isList
+                    )
+                )
             }
         }
         file.appendText(") {\n")
@@ -168,12 +179,20 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
         //写入Collection<addBuff>
         file.appendText(
             "\n\nfun Collection<$fullName?>.addBuff() =\n" +
-                    "    map { it?.addBuff() } as List<$className>"
+                    "    map { it?.addBuff() }"
+        )
+        file.appendText(
+            "\nfun Collection<$fullName>.addBuff() =\n" +
+                    "    map { it.addBuff() }"
         )
         //写入Collection<removeBuff>
         file.appendText(
             "\n\nfun Collection<$className?>.removeBuff() =\n" +
-                    "    map { it?.removeBuff() } as List<$fullName>"
+                    "    map { it?.removeBuff() }"
+        )
+        file.appendText(
+            "\nfun Collection<$className>.removeBuff() =\n" +
+                    "    map { it.removeBuff() }"
         )
         file.close()
     }
