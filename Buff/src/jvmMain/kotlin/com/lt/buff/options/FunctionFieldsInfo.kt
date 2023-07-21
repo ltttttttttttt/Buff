@@ -10,5 +10,11 @@ internal class FunctionFieldsInfo(
     val isInTheConstructor: Boolean,
     val isBuffBean: Boolean,
     val nullable: String,
-    val isList: Boolean = false,
-)
+    val isList: Boolean,
+    val typeString: String,
+) {
+    /**
+     * 获取addBuff或removeBuff的后缀,用于区分type是否可空
+     */
+    fun getBuffSuffix(): String = if (isList && typeString.endsWith("?>")) "WithNull" else ""
+}

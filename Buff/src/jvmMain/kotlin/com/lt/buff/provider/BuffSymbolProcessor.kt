@@ -3,6 +3,7 @@ package com.lt.buff.provider
 import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
+import com.google.devtools.ksp.symbol.ClassKind
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.validate
@@ -18,9 +19,8 @@ internal class BuffSymbolProcessor(private val environment: SymbolProcessorEnvir
     override fun process(resolver: Resolver): List<KSAnnotated> {
         val ret = mutableListOf<KSAnnotated>()
         resolver.getSymbolsWithAnnotation(Buff::class.qualifiedName!!)
-            .toList()
             .forEach {
-                if (it is KSClassDeclaration && it.classKind.type == "class") {
+                if (it is KSClassDeclaration && it.classKind == ClassKind.CLASS) {
                     if (!it.validate()) ret.add(it)
                     else it.accept(BuffVisitor(environment), Unit)//处理符号
                 }

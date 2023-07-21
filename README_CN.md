@@ -16,10 +16,6 @@
 
 1. 将beans中的某些字段转换为可以直接使用的MutableState&lt;T&gt;
 
-## 待实现功能
-
-1. 支持MutableList
-
 ## 使用方式
 
 Step 1和2.添加依赖:
@@ -47,7 +43,7 @@ dependencies {
 ```kotlin
 plugins {
     ...
-    id("com.google.devtools.ksp") version "1.8.20-1.0.10"//this,前面的1.7.10对应你的kotlin版本,更多版本参考: https://github.com/google/ksp/releases
+    id("com.google.devtools.ksp") version "1.8.20-1.0.10"//this,前面的1.8.20对应你的kotlin版本,更多版本参考: https://github.com/google/ksp/releases
 }
 
 ...
