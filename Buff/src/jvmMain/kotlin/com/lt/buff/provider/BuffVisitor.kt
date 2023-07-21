@@ -125,13 +125,12 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
                     }).also {\n"
         )
         functionFields.filter { !it.isInTheConstructor }.forEach {
-            val isList = if (it.isList) it.nullable + ".toList()" else ""
             file.appendText(
                 "            it.${it.fieldName} = ${
                     if (it.isBuffBean)
-                        "${it.fieldName}$isList${it.nullable}.removeBuff()"
+                        "${it.fieldName}${if (it.isList) "" else it.nullable}.removeBuff()"
                     else
-                        it.fieldName + isList
+                        it.fieldName
                 }\n"
             )
         }
@@ -178,7 +177,7 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
         file.appendText("    )\n\n${options.getCustomInFile(::getInfo)}")
         //写入Collection<addBuff>
         file.appendText(
-            "\n\nfun Collection<$fullName?>.addBuff() =\n" +
+            "\n\nfun Collection<$fullName?>.addBuffWithNull() =\n" +
                     "    map { it?.addBuff() }"
         )
         file.appendText(
@@ -187,7 +186,7 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
         )
         //写入Collection<removeBuff>
         file.appendText(
-            "\n\nfun Collection<$className?>.removeBuff() =\n" +
+            "\n\nfun Collection<$className?>.removeBuffWithNull() =\n" +
                     "    map { it?.removeBuff() }"
         )
         file.appendText(

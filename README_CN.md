@@ -16,10 +16,6 @@
 
 1. 将beans中的某些字段转换为可以直接使用的MutableState&lt;T&gt;
 
-## 待实现功能
-
-1. 支持MutableList
-
 ## 使用方式
 
 Step 1和2.添加依赖:

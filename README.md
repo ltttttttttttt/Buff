@@ -16,10 +16,6 @@
 
 1. Convert some fields in beans to MutableState&lt;T&gt; that can be used directly
 
-## Capability to be achieved
-
-<a href="https://github.com/ltttttttttttt/Buff/blob/main/README_CN.md">see this</a>
-
 ## How to use
 
 Step 1 and 2.add dependencies:
