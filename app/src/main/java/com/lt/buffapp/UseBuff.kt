@@ -38,12 +38,14 @@ class BuffBean(
     val id: Int? = null,
     var info2: InfoBean? = null,
     var infoList2: List<InfoBean>? = null,
+    var infoList4: List<InfoBean?>? = null,
 ) {
     var name: String? = null
     var info: InfoBean? = null
     var infoBean: InfoBean = InfoBean()
     var type: Type? = null
     var infoList: List<InfoBean?>? = null
+    var infoList3: List<InfoBean>? = null
     var list: List<String>? = null
     var infoListList: List<List<InfoBean>>? = null
     var map: Map<String, InfoBean>? = null

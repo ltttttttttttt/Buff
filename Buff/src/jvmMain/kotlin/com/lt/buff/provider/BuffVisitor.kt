@@ -54,13 +54,19 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
         //遍历构造内的字段
         classDeclaration.primaryConstructor?.parameters?.forEach {
             val name = it.name?.getShortName() ?: ""
-            val (ksType, isBuffBean, typeName, nullable, finallyTypeName) = getKSTypeInfo(
-                it.type,
-                options
-            )
+            val ksTypeInfo = getKSTypeInfo(it.type, options)
             //写入构造内的普通字段
-            file.appendText("    ${if (it.isVal) "val" else "var"} $name: $finallyTypeName,\n")
-            functionFields.add(FunctionFieldsInfo(name, true, isBuffBean, nullable))
+            file.appendText("    ${if (it.isVal) "val" else "var"} $name: ${ksTypeInfo.finallyTypeName},\n")
+            functionFields.add(
+                FunctionFieldsInfo(
+                    name,
+                    true,
+                    ksTypeInfo.isBuffBean,
+                    ksTypeInfo.nullable,
+                    ksTypeInfo.isList,
+                    ksTypeInfo.typeString,
+                )
+            )
         }
         //遍历所有字段
         classDeclaration.getAllProperties().forEach {
@@ -98,7 +104,8 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
                         false,
                         isBuffBean,
                         nullable,
-                        info.isList
+                        info.isList,
+                        info.typeString,
                     )
                 )
             }
@@ -114,21 +121,21 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
         file.appendText(
             "\n    fun removeBuff(): $fullName =\n" +
                     "        $fullName(${
-                        functionFields.filter { it.isInTheConstructor }
-                            .map {
-                                if (it.isBuffBean)
-                                    "${it.fieldName}${it.nullable}.removeBuff()"
-                                else
-                                    it.fieldName
-                            }
-                            .joinToString()
+                        functionFields.filter { it.isInTheConstructor }.joinToString {
+                            if (it.isBuffBean)
+                                "${it.fieldName}${it.nullable}.removeBuff${it.getBuffSuffix()}()"
+                            else
+                                it.fieldName
+                        }
                     }).also {\n"
         )
         functionFields.filter { !it.isInTheConstructor }.forEach {
             file.appendText(
                 "            it.${it.fieldName} = ${
                     if (it.isBuffBean)
-                        "${it.fieldName}${if (it.isList) "" else it.nullable}.removeBuff()"
+                        "${it.fieldName}${
+                            if (it.isList) "" else it.nullable
+                        }.removeBuff${it.getBuffSuffix()}()"
                     else
                         it.fieldName
                 }\n"
@@ -147,7 +154,7 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
                 file.appendText(
                     "        ${
                         if (it.isBuffBean)
-                            "${it.fieldName}${it.nullable}.addBuff()"
+                            "${it.fieldName}${it.nullable}.addBuff${it.getBuffSuffix()}()"
                         else
                             it.fieldName
                     },\n"
@@ -157,7 +164,7 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
                     file.appendText(
                         "        mutableStateOf(${
                             if (it.isBuffBean)
-                                "${it.fieldName}${it.nullable}.addBuff()"
+                                "${it.fieldName}${it.nullable}.addBuff${it.getBuffSuffix()}()"
                             else
                                 it.fieldName
                         }),\n"
@@ -166,7 +173,7 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
                     file.appendText(
                         "        ${
                             if (it.isBuffBean)
-                                "${it.fieldName}${it.nullable}.addBuff()"
+                                "${it.fieldName}${it.nullable}.addBuff${it.getBuffSuffix()}()"
                             else
                                 it.fieldName
                         }${it.nullable}.toMutableStateList() ?: mutableStateListOf(),\n"
