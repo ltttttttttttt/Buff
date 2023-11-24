@@ -33,8 +33,8 @@ plugins {
 
 dependencies {
     ...
-    implementation("io.github.ltttttttttttt:Buff-lib:$version")//this,such as 0.1.2
-    ksp("io.github.ltttttttttttt:Buff:$version")//this,such as 0.1.2
+    implementation("io.github.ltttttttttttt:Buff-lib:$version")//this,such as 1.0.1
+    ksp("io.github.ltttttttttttt:Buff:$version")//this,such as 1.0.1
 }
 ```
 
@@ -50,7 +50,7 @@ plugins {
 val commonMain by getting {
     dependencies {
         ...
-        api("io.github.ltttttttttttt:Buff-lib:$version")//this,such as 0.1.2
+        api("io.github.ltttttttttttt:Buff-lib:$version")//this,such as 1.0.1
     }
 }
 
