@@ -45,7 +45,7 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
         )
         file.appendText(
             "${options.getClassSerializeAnnotation()}\n" +
-                    "class $className(\n"
+                    "class $className @Deprecated(\"Do not directly call the constructor, instead use addBuff()\") constructor(\n"
         )
         //类内的字段(非构造内的)
         val classFields = mutableListOf<String>()
