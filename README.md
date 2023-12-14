@@ -2,7 +2,7 @@
 
 <p align="center">Add status to beans in Jetpack(jb) Compose, Fields in beans can be directly used as the MutableState&lt;T&gt;</p>
 
-<p>⚠️Non mainstream warning:If the content on this page causes your discomfort,please press Ctrl+W</p>
+<p align="center">⚠️Non mainstream warning:If the content on this page causes your discomfort,please press Ctrl+W</p>
 
 <p align="center">
 <img src="https://img.shields.io/badge/Kotlin-Multiplatform-%237f52ff?logo=kotlin">
