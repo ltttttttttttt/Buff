@@ -2,7 +2,7 @@
 
 <p align="center">将beans中的某些字段转换为可以直接使用的MutableState&lt;T&gt;,适用于Jetpack(jb) Compose</p>
 
-<p>⚠️非主流警告:若此页面所述内容引起了您的不适,请按下Ctrl+W</p>
+<p align="center">⚠️非主流警告:若此页面所述内容引起了您的不适,请按下Ctrl+W</p>
 
 <p align="center">
 <img src="https://img.shields.io/badge/Kotlin-Multiplatform-%237f52ff?logo=kotlin">
