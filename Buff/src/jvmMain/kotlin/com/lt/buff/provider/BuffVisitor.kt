@@ -5,6 +5,7 @@ import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSVisitorVoid
 import com.lt.buff.appendText
+import com.lt.buff.getAnnotationFullClassName
 import com.lt.buff.getKSTypeInfo
 import com.lt.buff.options.CustomOptionsInfo
 import com.lt.buff.options.FunctionFieldsInfo
@@ -28,6 +29,13 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
         val fullName = classDeclaration.qualifiedName?.asString()
             ?: (classDeclaration.packageName.asString() + classDeclaration.simpleName.asString())
         val className = "$originalClassName${options.suffix}"
+        val haveStable = classDeclaration.annotations.find {
+            getAnnotationFullClassName(it) == "androidx.compose.runtime.Stable"
+        } != null
+        val haveImmutable = classDeclaration.annotations.find {
+            getAnnotationFullClassName(it) == "androidx.compose.runtime.Immutable"
+        } != null
+
         val file = environment.codeGenerator.createNewFile(
             Dependencies(
                 true,
@@ -40,9 +48,15 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
             "import androidx.compose.runtime.MutableState\n" +
                     "import androidx.compose.runtime.mutableStateListOf\n" +
                     "import androidx.compose.runtime.mutableStateOf\n" +
+                    "import androidx.compose.runtime.Stable\n" +
+                    "import androidx.compose.runtime.Immutable\n" +
                     "import androidx.compose.runtime.snapshots.SnapshotStateList\n" +
                     "import androidx.compose.runtime.toMutableStateList\n\n"
         )
+        if (haveStable)
+            file.appendText("@Stable\n")
+        if (haveImmutable)
+            file.appendText("@Immutable\n")
         file.appendText(
             "${options.getClassSerializeAnnotation()}\n" +
                     "class $className @Deprecated(\"Do not directly call the constructor, instead use addBuff()\") constructor(\n"

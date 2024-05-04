@@ -1,6 +1,7 @@
 package com.lt.buff
 
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
+import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSTypeReference
 import com.google.devtools.ksp.symbol.Nullability
 import com.lt.buff.options.KSTypeInfo
@@ -41,7 +42,11 @@ internal fun String?.w(environment: SymbolProcessorEnvironment) {
  * [options] 用户的配置
  * [isFirstFloor] 是否是最外层,用于判断泛型
  */
-internal fun getKSTypeInfo(ks: KSTypeReference, options: KspOptions, isFirstFloor: Boolean = true): KSTypeInfo {
+internal fun getKSTypeInfo(
+    ks: KSTypeReference,
+    options: KspOptions,
+    isFirstFloor: Boolean = true
+): KSTypeInfo {
     //type对象
     val ksType = ks.resolve()
     //类是否有Buff注解
@@ -96,4 +101,22 @@ internal fun getKSTypeInfo(ks: KSTypeReference, options: KspOptions, isFirstFloo
         typeString,
         isList
     )
+}
+
+/**
+ * 获取注解的全类名
+ */
+internal fun getAnnotationFullClassName(ksa: KSAnnotation): String {
+    val ksType = ksa.annotationType.resolve()
+    //完整type字符串
+    return ksType.declaration.let {
+        val name = it.qualifiedName?.asString()
+        if (name != null)
+            return@let name
+        val packageName = it.packageName.asString()
+        return@let if (packageName.isEmpty())
+            ksa.shortName.asString()
+        else
+            "$packageName.${it.simpleName.asString()}"
+    }
 }

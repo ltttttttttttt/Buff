@@ -107,3 +107,5 @@ ksp {
     arg("customInFileWithBuff", "//File end")//类外,kt文件内
 }
 ```
+
+项目提供了对Compose可变性注解的支持,如果原Bean带有 @Stable 或 @Immutable 注解,则生成的Buff类也带有相应注解

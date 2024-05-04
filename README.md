@@ -109,3 +109,5 @@ ksp {
     arg("customInFileWithBuff", "//File end")//in file
 }
 ```
+
+The project provides support for Compose variability annotations. If the original bean has @Stable or @Immutable annotations, the generated Buff class also has corresponding annotations
