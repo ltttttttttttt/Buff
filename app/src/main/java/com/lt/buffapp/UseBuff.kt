@@ -5,6 +5,8 @@ import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import com.lt.buff.Buff
 import com.lt.buffapp.ui.theme.Type
@@ -34,6 +36,7 @@ fun ColumnScope.UseBuff() {
 
 @kotlinx.serialization.Serializable
 @Buff
+@Stable
 class BuffBean(
     val id: Int? = null,
     var info2: InfoBean? = null,

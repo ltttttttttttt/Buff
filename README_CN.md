@@ -2,7 +2,7 @@
 
 <p align="center">将beans中的某些字段转换为可以直接使用的MutableState&lt;T&gt;,适用于Jetpack(jb) Compose</p>
 
-<p>⚠️非主流警告:此项目违背了'唯一可信数据源'和'函数式编程思想',若此页面所述内容引起了您的不适,请按下Ctrl+W</p>
+<p align="center">⚠️非主流警告:若此页面所述内容引起了您的不适,请按下Ctrl+W</p>
 
 <p align="center">
 <img src="https://img.shields.io/badge/Kotlin-Multiplatform-%237f52ff?logo=kotlin">
@@ -107,3 +107,5 @@ ksp {
     arg("customInFileWithBuff", "//File end")//类外,kt文件内
 }
 ```
+
+项目提供了对Compose可变性注解的支持,如果原Bean带有 @Stable 或 @Immutable 注解,则生成的Buff类也带有相应注解
