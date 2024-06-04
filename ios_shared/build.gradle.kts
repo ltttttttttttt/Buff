@@ -22,6 +22,7 @@ plugins {
     id("org.jetbrains.compose") version composeVersion
     id("com.android.library")
     kotlin("native.cocoapods")
+    kotlin("plugin.compose") version kotlinVersion
 }
 
 group = "com.lt.ltttttttttttt"
@@ -107,7 +108,7 @@ kotlin {
         }
 
         val androidMain by getting
-        val androidTest by getting {
+        val androidUnitTest by getting {
             dependencies {
                 implementation("junit:junit:4.13.2")
             }

@@ -3,6 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     kotlin("plugin.serialization") version kotlinVersion
     id("com.google.devtools.ksp") version kspVersion
+    kotlin("plugin.compose") version kotlinVersion
 }
 
 android {
@@ -59,12 +60,12 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
-    buildFeatures {
-        compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = composeCompilerVersion
-    }
+//    buildFeatures {
+//        compose = true
+//    }
+//    composeOptions {
+//        kotlinCompilerExtensionVersion = composeCompilerVersion
+//    }
     //packagingOptions {
     //    resources {
     //        excludes += '/META-INF/{AL2.0,LGPL2.1}'
