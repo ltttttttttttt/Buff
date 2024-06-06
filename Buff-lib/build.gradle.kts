@@ -62,8 +62,6 @@ kotlin {
             baseName = "Buff"
             isStatic = true
         }
-        extraSpecAttributes["resources"] =
-            "['resources/**']"
     }
 
     sourceSets {
