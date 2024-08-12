@@ -1,6 +1,6 @@
 <h1 align="center">Buff</h1>
 
-<p align="center">Add status to beans in Jetpack(jb) Compose, Fields in beans can be directly used as the MutableState&lt;T&gt;</p>
+<p align="center">Add status to beans in Compose Multiplatform, Fields in beans can be directly used as the MutableState&lt;T&gt;</p>
 
 <p align="center">⚠️Non mainstream warning:If the content on this page causes your discomfort,please press Ctrl+W</p>
 
