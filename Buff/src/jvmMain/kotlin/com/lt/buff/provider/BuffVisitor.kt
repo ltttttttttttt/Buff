@@ -63,11 +63,14 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
         )
         //类内的字段(非构造内的)
         val classFields = mutableListOf<String>()
+        //构造内的字段
+        val constructorFields = mutableListOf<String>()
         //addBuff和removeBuff函数用到的字段
         val functionFields = mutableListOf<FunctionFieldsInfo>()
         //遍历构造内的字段
         classDeclaration.primaryConstructor?.parameters?.forEach {
             val name = it.name?.getShortName() ?: ""
+            constructorFields.add(name)
             val ksTypeInfo = getKSTypeInfo(it.type, options)
             //写入构造内的普通字段
             file.appendText("    ${if (it.isVal) "val" else "var"} $name: ${ksTypeInfo.finallyTypeName},\n")
@@ -85,8 +88,8 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
         //遍历所有字段
         classDeclaration.getAllProperties().forEach {
             //只解析类成员
-            if (it.parent is KSClassDeclaration) {
-                val fieldName = it.simpleName.getShortName()
+            val fieldName = it.simpleName.getShortName()
+            if (fieldName !in constructorFields) {
                 if (!it.isMutable)
                     throw RuntimeException("$originalClassName.$fieldName: It is meaningless for the field of val to change to the MutableState<T>")
                 val info = getKSTypeInfo(it.type, options)
