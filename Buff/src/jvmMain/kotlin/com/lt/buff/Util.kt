@@ -2,11 +2,11 @@ package com.lt.buff
 
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.symbol.KSAnnotation
+import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSTypeReference
-import com.google.devtools.ksp.symbol.Nullability
-import com.lt.buff.options.KSTypeInfo
+import com.lt.buff.options.BuffKSTypeInfo
 import com.lt.buff.options.KspOptions
-import java.io.OutputStream
+import com.lt.ksp.getKSTypeInfo
 
 /**
  * creator: lt  2022/10/21  lt.dygzs@qq.com
@@ -32,14 +32,10 @@ internal fun String?.w(environment: SymbolProcessorEnvironment) {
 /**
  * 获取ksType的信息
  * [ks] KSTypeReference信息
- * [options] 用户的配置
  * [isFirstFloor] 是否是最外层,用于判断泛型
  */
-internal fun getKSTypeInfo(
-    ks: KSTypeReference,
-    options: KspOptions,
-    isFirstFloor: Boolean = true
-): KSTypeInfo {
+internal fun getBuffKSTypeInfo(ks: KSTypeReference, thisClass: KSClassDeclaration, isFirstFloor: Boolean = true): BuffKSTypeInfo {
+    val ksTypeInfo = getKSTypeInfo(ks, null, thisClass)
     //type对象
     val ksType = ks.resolve()
     //类是否有Buff注解
@@ -48,6 +44,10 @@ internal fun getKSTypeInfo(
             .find { it.shortName.getShortName() == buffName } != null
     //泛型中是否包含Buff注解
     var typeHaveBuff = false
+    //完整type字符串
+    val typeName = ksTypeInfo.thisTypeName.toString()
+    //是否可空
+    val nullable = if (ksTypeInfo.nullable) "?" else ""
     //是否是List<T>,后续在需要的地方会将List<T>转换为mutableStateListOf()
     var isList = false
     //泛型(只支持List<T>)
@@ -60,7 +60,7 @@ internal fun getKSTypeInfo(
         ) {
             isList = true
             //处理List<T>,支持转state,且自动加Buff
-            val info = getKSTypeInfo(ksType.arguments.first().type!!, options, false)
+            val info = getBuffKSTypeInfo(ksType.arguments.first().type!!, thisClass, false)
             typeHaveBuff = info.isBuffBean
             val finallyTypeName = info.finallyTypeName
             if (finallyTypeName.isNotEmpty())
@@ -71,20 +71,12 @@ internal fun getKSTypeInfo(
             ""//无泛型
         else {
             //其他泛型,原样输出
-            ksType.arguments.filter { it.type != null }.joinToString(prefix = "<", postfix = ">") {
-                val info = getKSTypeInfo(it.type!!, options, false)
-                "${info.typeName}${info.typeString}${info.nullable}"
-            }
+            ksTypeInfo.childType.joinToString(prefix = "<", postfix = ">")
         }
-    //完整type字符串
-    val typeName =
-        "${ksType.declaration.packageName.asString()}.${ksType.declaration.simpleName.asString()}"
-    //是否可空
-    val nullable = if (ksType.nullability == Nullability.NULLABLE) "?" else ""
     //最后确定下来的type名字
     val finallyTypeName =
-        if (isBuffBean) "$typeName${options.suffix}$typeString$nullable" else "$typeName$typeString$nullable"
-    return KSTypeInfo(
+        if (isBuffBean) "$typeName${KspOptions.suffix}$typeString$nullable" else "$typeName$typeString$nullable"
+    return BuffKSTypeInfo(
         ksType,
         //自身或泛型包含Buff注解
         isBuffBean || typeHaveBuff,
