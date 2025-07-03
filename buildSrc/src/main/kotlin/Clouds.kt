@@ -5,6 +5,7 @@ import org.gradle.kotlin.dsl.maven
  * 注册各种maven服务器(包含镜像服务器)
  */
 fun RepositoryHandler.mavenServers() {
+    mavenCenterJitpack()
     mavenCenterTencentCloud()
     mavenCentral()
     jcenter()
@@ -14,7 +15,6 @@ fun RepositoryHandler.mavenServers() {
     maven("https://repo1.maven.org/maven2/")//友盟
     maven("https://artifact.bytedance.com/repository/pangle")//字节
     maven("https://artifact.bytedance.com/repository/AwemeOpenSDK")//字节
-    mavenCenterJitpack()
 }
 
 /**

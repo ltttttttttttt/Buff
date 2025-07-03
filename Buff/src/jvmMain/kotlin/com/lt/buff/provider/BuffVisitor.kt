@@ -4,12 +4,12 @@ import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSVisitorVoid
-import com.lt.buff.appendText
 import com.lt.buff.getAnnotationFullClassName
 import com.lt.buff.getKSTypeInfo
 import com.lt.buff.options.CustomOptionsInfo
 import com.lt.buff.options.FunctionFieldsInfo
 import com.lt.buff.options.KspOptions
+import com.lt.ksp.appendText
 
 /**
  * creator: lt  2022/10/20  lt.dygzs@qq.com

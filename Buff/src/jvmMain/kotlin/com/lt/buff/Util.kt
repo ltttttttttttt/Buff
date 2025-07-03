@@ -17,13 +17,6 @@ import java.io.OutputStream
 internal val buffName = Buff::class.simpleName
 
 /**
- * 向os中写入文字
- */
-internal fun OutputStream.appendText(str: String) {
-    this.write(str.toByteArray())
-}
-
-/**
  * 如果字符串为空或长度为0,就使用lambda中的字符串
  */
 internal inline fun String?.ifNullOfEmpty(defaultValue: () -> String): String =
