@@ -1,21 +1,55 @@
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
+import PublishConfig.inceptionYear
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
     kotlin("multiplatform")
     kotlin("native.cocoapods")
     id("com.android.library")
-    id("convention.publication")
+    //https://github.com/vanniktech/gradle-maven-publish-plugin
+    //https://www.jetbrains.com/help/kotlin-multiplatform-dev/multiplatform-publish-libraries.html#publish-to-maven-central-using-continuous-integration
+    //https://central.sonatype.com/publishing/deployments
+    id("com.vanniktech.maven.publish") version publishVersion
 }
 
-group = "io.github.ltttttttttttt"
-//上传到mavenCentral命令: ./gradlew publishAllPublicationsToSonatypeRepository
-//mavenCentral后台: https://s01.oss.sonatype.org/#stagingRepositories
+group = PublishConfig.group
 version = mVersion
 
+mavenPublishing {
+    publishToMavenCentral()
+
+    signAllPublications()
+
+    coordinates(group.toString(), project.name, version.toString())
+
+    pom {
+        name = project.name
+        description = PublishConfig.description
+        inceptionYear = PublishConfig.inceptionYear
+        url = PublishConfig.projectUrl
+        licenses {
+            license {
+                name = "The Apache License, Version 2.0"
+                url = "https://www.apache.org/licenses/LICENSE-2.0.txt"
+                distribution = "https://www.apache.org/licenses/LICENSE-2.0.txt"
+            }
+        }
+        developers {
+            developer {
+                id = "ltttttttttttt"
+                name = "lt"
+                email = "lt.dygzs@qq.com"
+                url = "https://github.com/ltttttttttttt"
+            }
+        }
+        scm {
+            url = PublishConfig.projectUrl
+        }
+    }
+}
+
 kotlin {
-    android {
-        publishLibraryVariants("debug", "release")
+    androidTarget {
+        publishLibraryVariants("release")
     }
 
     jvm {
@@ -26,7 +60,8 @@ kotlin {
         }
     }
 
-    ios()
+    iosX64()
+    iosArm64()
     iosSimulatorArm64()
 
     js(IR) {
@@ -36,7 +71,6 @@ kotlin {
         }
     }
 
-    @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         moduleName = "ComposeViews"
         browser {
@@ -74,14 +108,12 @@ kotlin {
         val jvmMain by getting
         val jvmTest by getting
 
-        val iosMain by getting
-        val iosTest by getting
-        val iosSimulatorArm64Main by getting {
-            dependsOn(iosMain)
-        }
-        val iosSimulatorArm64Test by getting {
-            dependsOn(iosTest)
-        }
+        val iosX64Main by getting
+        val iosX64Test by getting
+        val iosArm64Main by getting
+        val iosArm64Test by getting
+        val iosSimulatorArm64Main by getting
+        val iosSimulatorArm64Test by getting
 
         val jsMain by getting
 
@@ -93,7 +125,8 @@ kotlin {
 }
 
 android {
-    compileSdk = 33
+    namespace = "com.lt.buff"
+    compileSdk = 35
     defaultConfig {
         minSdk = 21
         targetSdk = 31

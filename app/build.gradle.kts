@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "com.lt.buffapp"
-    compileSdk = 33
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.lt.buffapp"

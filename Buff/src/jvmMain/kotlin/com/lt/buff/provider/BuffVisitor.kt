@@ -4,12 +4,12 @@ import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSVisitorVoid
-import com.lt.buff.appendText
 import com.lt.buff.getAnnotationFullClassName
-import com.lt.buff.getKSTypeInfo
+import com.lt.buff.getBuffKSTypeInfo
 import com.lt.buff.options.CustomOptionsInfo
 import com.lt.buff.options.FunctionFieldsInfo
 import com.lt.buff.options.KspOptions
+import com.lt.ksp.appendText
 
 /**
  * creator: lt  2022/10/20  lt.dygzs@qq.com
@@ -28,7 +28,7 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
         val originalClassName = classDeclaration.simpleName.asString()
         val fullName = classDeclaration.qualifiedName?.asString()
             ?: (classDeclaration.packageName.asString() + classDeclaration.simpleName.asString())
-        val className = "$originalClassName${options.suffix}"
+        val className = "$originalClassName${KspOptions.suffix}"
         val haveStable = classDeclaration.annotations.find {
             getAnnotationFullClassName(it) == "androidx.compose.runtime.Stable"
         } != null
@@ -63,12 +63,15 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
         )
         //类内的字段(非构造内的)
         val classFields = mutableListOf<String>()
+        //构造内的字段
+        val constructorFields = mutableListOf<String>()
         //addBuff和removeBuff函数用到的字段
         val functionFields = mutableListOf<FunctionFieldsInfo>()
         //遍历构造内的字段
         classDeclaration.primaryConstructor?.parameters?.forEach {
             val name = it.name?.getShortName() ?: ""
-            val ksTypeInfo = getKSTypeInfo(it.type, options)
+            constructorFields.add(name)
+            val ksTypeInfo = getBuffKSTypeInfo(it.type, classDeclaration)
             //写入构造内的普通字段
             file.appendText("    ${if (it.isVal) "val" else "var"} $name: ${ksTypeInfo.finallyTypeName},\n")
             functionFields.add(
@@ -85,11 +88,11 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
         //遍历所有字段
         classDeclaration.getAllProperties().forEach {
             //只解析类成员
-            if (it.parent is KSClassDeclaration) {
-                val fieldName = it.simpleName.getShortName()
+            val fieldName = it.simpleName.getShortName()
+            if (fieldName !in constructorFields) {
                 if (!it.isMutable)
                     throw RuntimeException("$originalClassName.$fieldName: It is meaningless for the field of val to change to the MutableState<T>")
-                val info = getKSTypeInfo(it.type, options)
+                val info = getBuffKSTypeInfo(it.type, classDeclaration)
                 val (ksType, isBuffBean, typeName, nullable, finallyTypeName) = info
                 val stateFieldName = "_${fieldName}_state"
                 //写入构造内的state字段,普通state或list state

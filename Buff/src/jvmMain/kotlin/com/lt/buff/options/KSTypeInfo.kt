@@ -7,7 +7,7 @@ import com.google.devtools.ksp.symbol.KSType
  * effect : 用于记录Type的信息
  * warning:
  */
-internal data class KSTypeInfo(
+internal data class BuffKSTypeInfo(
     val ksType: KSType,
     val isBuffBean: Boolean,
     val typeName: String,
