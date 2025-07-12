@@ -217,6 +217,7 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
             "\nfun Collection<$className>.removeBuff() =\n" +
                     "    map { it.removeBuff() }"
         )
+        file.flush()
         file.close()
     }
 }
