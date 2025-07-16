@@ -36,10 +36,11 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
             getAnnotationFullClassName(it) == "androidx.compose.runtime.Immutable"
         } != null
 
+        val sources = classDeclaration.containingFile?.let { arrayOf(it) } ?: run { arrayOf() }
         val file = environment.codeGenerator.createNewFile(
             Dependencies(
                 true,
-                classDeclaration.containingFile!!
+                *sources,
             ), packageName, className
         )
         //写入头文件
