@@ -86,10 +86,11 @@ internal class BuffVisitor(private val environment: SymbolProcessorEnvironment) 
         val buffBeanPackage = "com.lt.buff.bean"
 
         //将数据写入文件
+        val sources = classDeclaration.containingFile?.let { arrayOf(it) } ?: arrayOf() 
         val file = environment.codeGenerator.createNewFile(
             Dependencies(
                 true,
-                classDeclaration.containingFile!!
+                *sources,
             ), buffBeanPackage, className
         )
         //写入文件头部
