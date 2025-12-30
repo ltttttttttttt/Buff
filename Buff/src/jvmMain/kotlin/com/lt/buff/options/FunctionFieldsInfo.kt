@@ -6,15 +6,20 @@ package com.lt.buff.options
  * warning:
  */
 internal class FunctionFieldsInfo(
-    val fieldName: String,
-    val isInTheConstructor: Boolean,
-    val isBuffBean: Boolean,
-    val nullable: String,
-    val isList: Boolean,
-    val typeString: String,
+    val fieldName: String,//属性名
+    val isInTheConstructor: Boolean,//是否位于构造中
+    val isVal: Boolean,//是否是val
+    val typeInfo: BuffKSTypeInfo,//type信息
+    var isToState: Boolean = false,//属性是否需要转为state
 ) {
     /**
      * 获取addBuff或removeBuff的后缀,用于区分type是否可空
      */
-    fun getBuffSuffix(): String = if (isList && typeString.endsWith("?>")) "WithNull" else ""
+    fun getBuffSuffix(): String =
+        if (typeInfo.isList && typeInfo.typeString.endsWith("?>")) "WithNull" else ""
+
+    /**
+     * 获取私有状态的名字
+     */
+    fun getStateFieldName(): String = "_${fieldName}_state"
 }

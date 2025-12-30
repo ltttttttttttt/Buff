@@ -42,6 +42,7 @@ class BuffBean(
     var info2: InfoBean? = null,
     var infoList2: List<InfoBean>? = null,
     var infoList4: List<InfoBean?>? = null,
+    var infoList5: MutableList<InfoBean?>? = null,
 ) {
     var name: String? = null
     var info: InfoBean? = null
@@ -52,6 +53,7 @@ class BuffBean(
     var list: List<String>? = null
     var infoListList: List<List<InfoBean>>? = null
     var map: Map<String, InfoBean>? = null
+    var infoList6: MutableList<InfoBean?>? = null
 }
 
 @kotlinx.serialization.Serializable
