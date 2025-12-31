@@ -3,11 +3,14 @@ package com.lt.buff
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSClassDeclaration
-import com.google.devtools.ksp.symbol.KSTypeReference
+import com.google.devtools.ksp.symbol.KSDeclaration
+import com.google.devtools.ksp.symbol.KSType
+import com.google.devtools.ksp.symbol.Modifier
 import com.lt.buff.options.BuffKSTypeInfo
 import com.lt.buff.options.KspOptions
 import com.lt.ksp.getKSTypeInfo
 import com.lt.ksp.isList
+import com.lt.ksp.model.KSTypeInfo
 
 /**
  * creator: lt  2022/10/21  lt.dygzs@qq.com
@@ -32,13 +35,17 @@ internal fun String?.w(environment: SymbolProcessorEnvironment) {
 
 /**
  * 获取ksType的信息
- * [ks] KSTypeReference信息
  * [isFirstFloor] 是否是最外层,用于判断泛型
  */
-internal fun getBuffKSTypeInfo(ks: KSTypeReference, thisClass: KSClassDeclaration, isFirstFloor: Boolean = true): BuffKSTypeInfo {
+internal fun getBuffKSTypeInfo(
+    ksType: KSType,
+    thisClass: KSClassDeclaration,
+    isFirstFloor: Boolean = true,
+    packageSet: MutableSet<String>,
+): BuffKSTypeInfo {
     //type对象
-    val ksType = ks.resolve()
     val ksTypeInfo = getKSTypeInfo(ksType, null, thisClass)
+    packageSet.add(ksTypeInfo.thisTypeName.packageName.asString())
     //类是否有Buff注解
     val isBuffBean =
         ksType.declaration.annotations.toList()
@@ -46,7 +53,7 @@ internal fun getBuffKSTypeInfo(ks: KSTypeReference, thisClass: KSClassDeclaratio
     //泛型中是否包含Buff注解
     var typeHaveBuff = false
     //完整type字符串
-    val typeName = ksTypeInfo.thisTypeName.toString()
+    val typeName = ksTypeInfo.thisTypeName.simpleName.asString()
     //是否可空
     val nullable = if (ksTypeInfo.nullable) "?" else ""
     //是否是List<T>,后续在需要的地方会将List<T>转换为mutableStateListOf()
@@ -68,7 +75,12 @@ internal fun getBuffKSTypeInfo(ks: KSTypeReference, thisClass: KSClassDeclaratio
             && ksType.arguments.first().type != null
         ) {
             //处理List<T>,支持转state,且自动加Buff
-            val info = getBuffKSTypeInfo(ksType.arguments.first().type!!, thisClass, false)
+            val info = getBuffKSTypeInfo(
+                ksType.arguments.first().type!!.resolve(),
+                thisClass,
+                false,
+                packageSet
+            )
             typeHaveBuff = info.isBuffBean
             val finallyTypeName = info.finallyTypeName
             if (finallyTypeName.isNotEmpty())
@@ -79,7 +91,9 @@ internal fun getBuffKSTypeInfo(ks: KSTypeReference, thisClass: KSClassDeclaratio
             ""//无泛型
         else {
             //其他泛型,原样输出
-            ksTypeInfo.childType.joinToString(prefix = "<", postfix = ">")
+            ksTypeInfo.childType.joinToString(prefix = "<", postfix = ">") {
+                it.asString()
+            }
         }
     //最后确定下来的type名字
     val finallyTypeName =
@@ -113,4 +127,29 @@ internal fun getAnnotationFullClassName(ksa: KSAnnotation): String {
         else
             "$packageName.${it.simpleName.asString()}"
     }
+}
+
+internal fun KSTypeInfo.asString(): String {
+    val typeString = thisTypeName.simpleName.asString()
+    val childTypeString =
+        if (childType.isEmpty()) "" else childType.joinToString(prefix = "<", postfix = ">")
+    val nullableString = if (nullable) "?" else ""
+    return typeString + childTypeString + nullableString
+}
+
+/**
+ * 获取类名(支持嵌套类)
+ */
+internal fun getClassName(parentDeclaration: KSDeclaration?, className: String): String {
+    //嵌套类
+    return if (
+        parentDeclaration is KSClassDeclaration
+        //&& !parentDeclaration.modifiers.contains(Modifier.INNER)
+    )
+        getClassName(
+            parentDeclaration.parentDeclaration,
+            "${parentDeclaration.simpleName.asString()}.$className"
+        )
+    else
+        className
 }

@@ -5,7 +5,6 @@ import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import com.lt.buff.Buff
@@ -67,5 +66,11 @@ class InfoBean(
     @Buff
     class InnerClass {
         var name: String = ""
+
+        @Serializable
+        @Buff
+        class InnerClass2 {
+            var name: String = ""
+        }
     }
 }
