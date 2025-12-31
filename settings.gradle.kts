@@ -2,4 +2,4 @@ rootProject.name = "BuffApp"
 include(":app")
 include(":Buff")
 include(":Buff-lib")
-include(":ios_shared")
+//include(":ios_shared")

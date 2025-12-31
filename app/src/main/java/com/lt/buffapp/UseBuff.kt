@@ -5,7 +5,6 @@ import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import com.lt.buff.Buff
@@ -42,6 +41,7 @@ class BuffBean(
     var info2: InfoBean? = null,
     var infoList2: List<InfoBean>? = null,
     var infoList4: List<InfoBean?>? = null,
+    var infoList5: MutableList<InfoBean?>? = null,
 ) {
     var name: String? = null
     var info: InfoBean? = null
@@ -52,6 +52,7 @@ class BuffBean(
     var list: List<String>? = null
     var infoListList: List<List<InfoBean>>? = null
     var map: Map<String, InfoBean>? = null
+    var infoList6: MutableList<InfoBean?>? = null
 }
 
 @kotlinx.serialization.Serializable
@@ -65,5 +66,11 @@ class InfoBean(
     @Buff
     class InnerClass {
         var name: String = ""
+
+        @Serializable
+        @Buff
+        class InnerClass2 {
+            var name: String = ""
+        }
     }
 }

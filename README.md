@@ -70,7 +70,7 @@ name) not in the constructor will be automatically converted to MutableState&lt;
 class BuffBean(
     val id: Int? = null,
 ) {
-    var name: String? = null
+    var isSelect: Boolean = false
 }
 ```
 
@@ -79,7 +79,7 @@ Example(reference UseBuff.kt):
 ```kotlin
 val buffBean = BuffBean(0)
 val bean = buffBean.addBuff()//Transform to the BuffBeanWithBuff
-bean.name//The name's getter and setter have the effect of MutableState<T>
+bean.isSelect = true//The isSelect's getter and setter have the effect of MutableState<T>
 bean.removeBuff()//Fallback to BuffBean(optional)
 ```
 

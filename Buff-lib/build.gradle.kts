@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
     kotlin("multiplatform")
-    kotlin("native.cocoapods")
+    //kotlin("native.cocoapods")
     id("com.android.library")
     //https://github.com/vanniktech/gradle-maven-publish-plugin
     //https://www.jetbrains.com/help/kotlin-multiplatform-dev/multiplatform-publish-libraries.html#publish-to-maven-central-using-continuous-integration
@@ -87,16 +87,16 @@ kotlin {
         binaries.executable()
     }
 
-    cocoapods {
-        summary = "Buff"
-        homepage = "https://github.com/ltttttttttttt/Buff"
-        ios.deploymentTarget = "14.1"
-        podfile = project.file("../iosApp/Podfile")
-        framework {
-            baseName = "Buff"
-            isStatic = true
-        }
-    }
+    //cocoapods {
+    //    summary = "Buff"
+    //    homepage = "https://github.com/ltttttttttttt/Buff"
+    //    ios.deploymentTarget = "14.1"
+    //    podfile = project.file("../iosApp/Podfile")
+    //    framework {
+    //        baseName = "Buff"
+    //        isStatic = true
+    //    }
+    //}
 
     sourceSets {
         val commonMain by getting
@@ -108,12 +108,12 @@ kotlin {
         val jvmMain by getting
         val jvmTest by getting
 
-        val iosX64Main by getting
-        val iosX64Test by getting
-        val iosArm64Main by getting
-        val iosArm64Test by getting
-        val iosSimulatorArm64Main by getting
-        val iosSimulatorArm64Test by getting
+        //val iosX64Main by getting
+        //val iosX64Test by getting
+        //val iosArm64Main by getting
+        //val iosArm64Test by getting
+        //val iosSimulatorArm64Main by getting
+        //val iosSimulatorArm64Test by getting
 
         val jsMain by getting
 

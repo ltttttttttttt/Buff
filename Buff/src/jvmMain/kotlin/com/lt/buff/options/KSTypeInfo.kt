@@ -15,4 +15,5 @@ internal data class BuffKSTypeInfo(
     val finallyTypeName: String,
     val typeString: String,
     val isList: Boolean,
+    val isMutableList: Boolean,
 )

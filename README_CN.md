@@ -69,7 +69,7 @@ Step 3.使用Buff注解
 class BuffBean(
     val id: Int? = null,
 ) {
-    var name: String? = null
+    var isSelect: Boolean = false
 }
 ```
 
@@ -78,7 +78,7 @@ class BuffBean(
 ```kotlin
 val buffBean = BuffBean(0)//这个BuffBean可以自己new出来,也可以通过序列化等方式
 val bean = buffBean.addBuff()//增加Buff,类型改为BuffBeanWithBuff
-bean.name//这个name的get和set就有了MutableState<T>的效果
+bean.isSelect = true//这个isSelect的get和set就有了MutableState<T>的效果
 bean.removeBuff()//退回为BuffBean(可选方法,可以不使用)
 ```
 
