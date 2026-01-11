@@ -2,8 +2,6 @@
 
 <p align="center">Add status to beans in Compose Multiplatform, Fields in beans can be directly used as the MutableState&lt;T&gt;</p>
 
-<p align="center">⚠️Non mainstream warning:If the content on this page causes your discomfort,please press Ctrl+W</p>
-
 <p align="center">
 <img src="https://img.shields.io/badge/Kotlin-Multiplatform-%237f52ff?logo=kotlin">
 <img src="https://img.shields.io/badge/license-Apache%202-blue.svg?maxAge=2592000">
@@ -28,13 +26,13 @@ version
 ```kotlin
 plugins {
     ...
-    id("com.google.devtools.ksp") version "1.8.20-1.0.10"//this,The left 1.8.20 corresponds to your the Kotlin version,more version: https://github.com/google/ksp/releases
+    id("com.google.devtools.ksp") version "2.1.21-2.0.1"//this,The left 2.1.21 corresponds to your the Kotlin version,more version: https://github.com/google/ksp/releases
 }
 
 dependencies {
     ...
-    implementation("io.github.ltttttttttttt:Buff-lib:$version")//this,such as 1.0.1
-    ksp("io.github.ltttttttttttt:Buff:$version")//this,such as 1.0.1
+    implementation("io.github.ltttttttttttt:Buff-lib:$version")//this,such as 2.0.1
+    ksp("io.github.ltttttttttttt:Buff:$version")//this,such as 2.0.1
 }
 ```
 
@@ -43,14 +41,14 @@ dependencies {
 ```kotlin
 plugins {
     ...
-    id("com.google.devtools.ksp") version "1.8.20-1.0.10"
+    id("com.google.devtools.ksp") version "2.1.21-2.0.1"
 }
 
 ...
 val commonMain by getting {
     dependencies {
         ...
-        api("io.github.ltttttttttttt:Buff-lib:$version")//this,such as 1.0.1
+        api("io.github.ltttttttttttt:Buff-lib:$version")//this,such as 2.0.1
     }
 }
 
@@ -63,7 +61,7 @@ dependencies {
 Step 3.Use Buff
 
 Add the @Buff to your bean, call the addBuff() transform to the new Any, The attribute (such as
-name) not in the constructor will be automatically converted to MutableState&lt;T&gt;
+name) will be automatically converted to MutableState&lt;T&gt;
 
 ```kotlin
 @Buff
@@ -89,16 +87,11 @@ Step 4.If you are using a version of ksp less than 1.0.9, the following configur
 
 Step 5.Optional configuration
 
-Serialize of this project uses kotlinx-serialization by default, If using other serialization support, modify it, Your app dir,
-build.gradle.kts add:
-
 ```kotlin
-ksp {
-    //Set the Annotation of the class, Usually as follows
-    arg("classSerializeAnnotationWithBuff", "//Not have")
-    //Set the Annotation of the field to transient, Usually as follows
-    arg("fieldSerializeTransientAnnotationWithBuff", "@kotlin.jvm.Transient")
-}
+@Buff(
+    scope,//which attributes of the bean should be buffed
+    variability//What mutable properties to deal with
+)
 ```
 
 Add custom code, reference [KspOptions.handlerCustomCode], Your app dir, build.gradle.kts add:

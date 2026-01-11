@@ -27,7 +27,7 @@ fun ColumnScope.UseBuff() {
         bean.info?.nick = it
     })
     Button(onClick = {
-        bean.toJson().showToast()
+        bean.removeBuff().toJson().showToast()
     }) {
         Text(text = "show json")
     }
