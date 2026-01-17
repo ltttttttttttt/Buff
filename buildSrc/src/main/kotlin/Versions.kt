@@ -4,4 +4,4 @@ const val composeVersion = "1.8.0"//compose版本
 const val kspVersion = "$kotlinVersion-2.0.1"//ksp版本
 const val publishVersion = "0.33.0"
 
-const val mVersion = "1.2.2"//此库的版本
+const val mVersion = "2.0.1"//此库的版本
