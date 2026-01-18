@@ -31,8 +31,8 @@ plugins {
 
 dependencies {
     ...
-    implementation("io.github.ltttttttttttt:Buff-lib:$version")//this,比如2.0.1
-    ksp("io.github.ltttttttttttt:Buff:$version")//this,比如2.0.1
+    implementation("io.github.ltttttttttttt:Buff-lib:$version")//this,比如2.0.2
+    ksp("io.github.ltttttttttttt:Buff:$version")//this,比如2.0.2
 }
 ```
 
@@ -48,7 +48,7 @@ plugins {
 val commonMain by getting {
     dependencies {
         ...
-        api("io.github.ltttttttttttt:Buff-lib:$version")//this,比如2.0.1
+        api("io.github.ltttttttttttt:Buff-lib:$version")//this,比如2.0.2
     }
 }
 
